@@ -24,6 +24,16 @@ const TOOLS = [
     command: 'firebase --version',
     installHint: 'Instala Firebase CLI: npm install -g firebase-tools',
   },
+  {
+    name: 'claude',
+    command: 'claude --version',
+    installHint: 'Instala Claude Code: npm install -g @anthropic-ai/claude-code (requiere licencia Geniova)',
+  },
+  {
+    name: 'karajan',
+    command: 'kj --version',
+    installHint: 'Instala Karajan: npm install -g karajan-code. Requiere Claude (obligatorio), Codex y Gemini opcionales (cuentas personales gratuitas)',
+  },
 ];
 
 /**
