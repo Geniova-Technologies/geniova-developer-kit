@@ -17,3 +17,4 @@ export async function main() {
     process.exit(1);
   }
 }
+// TODO: add integration tests
