@@ -1,0 +1,1346 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Referencia Tecnica — Geniova Developer Kit</title>
+  <meta name="description" content="Referencia tecnica completa del Geniova Developer Kit: arquitectura, git hooks, guidelines, agentes IA, MCPs y catalogo de proyectos.">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,wght@0,300;0,400;0,500;0,700&family=JetBrains+Mono:wght@400;500;700&family=Playfair+Display:wght@700;900&display=swap" rel="stylesheet">
+  <style>
+    *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+
+    :root {
+      --bg-deep: #08080c;
+      --bg-primary: #0f0f13;
+      --bg-surface: #16161d;
+      --bg-elevated: #1e1e28;
+      --bg-hover: #252532;
+      --border-subtle: rgba(255,255,255,0.06);
+      --border-medium: rgba(255,255,255,0.1);
+      --gold: #bfa15f;
+      --gold-dim: rgba(191,161,95,0.15);
+      --gold-glow: rgba(191,161,95,0.08);
+      --blue: #4a9eff;
+      --blue-dim: rgba(74,158,255,0.12);
+      --green: #34d399;
+      --green-dim: rgba(52,211,153,0.12);
+      --red: #f87171;
+      --text-primary: #e8e6e3;
+      --text-secondary: #8a8a97;
+      --text-tertiary: #55555f;
+      --font-body: 'DM Sans', sans-serif;
+      --font-display: 'Playfair Display', serif;
+      --font-mono: 'JetBrains Mono', monospace;
+    }
+
+    html { scroll-behavior: smooth; }
+
+    body {
+      font-family: var(--font-body);
+      background: var(--bg-deep);
+      color: var(--text-primary);
+      line-height: 1.6;
+      -webkit-font-smoothing: antialiased;
+      overflow-x: hidden;
+    }
+
+    /* --- Noise overlay --- */
+    body::before {
+      content: '';
+      position: fixed;
+      inset: 0;
+      background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.03'/%3E%3C/svg%3E");
+      pointer-events: none;
+      z-index: 9999;
+    }
+
+    .container {
+      max-width: 1120px;
+      margin: 0 auto;
+      padding: 0 24px;
+    }
+
+    a { color: var(--gold); text-decoration: none; transition: color 0.2s; }
+    a:hover { color: var(--text-primary); }
+
+    /* --- NAV --- */
+    nav {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      z-index: 100;
+      padding: 16px 0;
+      background: rgba(8,8,12,0.85);
+      backdrop-filter: blur(20px);
+      border-bottom: 1px solid var(--border-subtle);
+    }
+    nav .container {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+    .nav-brand {
+      font-family: var(--font-mono);
+      font-size: 14px;
+      font-weight: 500;
+      color: var(--text-primary);
+      letter-spacing: -0.02em;
+    }
+    .nav-brand span { color: var(--gold); }
+    .nav-links { display: flex; gap: 32px; }
+    .nav-links a {
+      font-size: 13px;
+      color: var(--text-secondary);
+      letter-spacing: 0.02em;
+      text-transform: uppercase;
+      font-weight: 500;
+    }
+    .nav-links a:hover { color: var(--text-primary); }
+    .nav-links a.active {
+      color: var(--gold);
+    }
+
+    /* --- PAGE HEADER --- */
+    .page-header {
+      padding: 140px 24px 80px;
+      text-align: center;
+      position: relative;
+    }
+    .page-header::before {
+      content: '';
+      position: absolute;
+      top: -20%;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 800px;
+      height: 600px;
+      background: radial-gradient(ellipse, var(--gold-glow) 0%, transparent 70%);
+      pointer-events: none;
+    }
+    .page-header-content {
+      position: relative;
+      z-index: 1;
+      max-width: 720px;
+      margin: 0 auto;
+    }
+    .page-header .hero-label {
+      display: inline-block;
+      font-family: var(--font-mono);
+      font-size: 11px;
+      letter-spacing: 0.15em;
+      text-transform: uppercase;
+      color: var(--gold);
+      border: 1px solid var(--gold-dim);
+      background: var(--gold-dim);
+      padding: 6px 16px;
+      border-radius: 100px;
+      margin-bottom: 32px;
+    }
+    .page-header h1 {
+      font-family: var(--font-display);
+      font-size: clamp(36px, 5vw, 56px);
+      font-weight: 900;
+      line-height: 1.1;
+      letter-spacing: -0.03em;
+      margin-bottom: 20px;
+      background: linear-gradient(135deg, var(--text-primary) 0%, var(--gold) 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+    .page-header p {
+      font-size: 17px;
+      color: var(--text-secondary);
+      max-width: 540px;
+      margin: 0 auto;
+      line-height: 1.7;
+    }
+
+    /* --- SECTIONS --- */
+    section { padding: 100px 0; position: relative; }
+
+    .section-label {
+      font-family: var(--font-mono);
+      font-size: 11px;
+      letter-spacing: 0.15em;
+      text-transform: uppercase;
+      color: var(--gold);
+      margin-bottom: 16px;
+    }
+    .section-title {
+      font-family: var(--font-display);
+      font-size: clamp(28px, 3.5vw, 42px);
+      font-weight: 700;
+      line-height: 1.15;
+      letter-spacing: -0.02em;
+      margin-bottom: 20px;
+    }
+    .section-subtitle {
+      font-size: 16px;
+      color: var(--text-secondary);
+      max-width: 560px;
+      line-height: 1.7;
+      margin-bottom: 56px;
+    }
+
+    /* Separator */
+    .divider {
+      height: 1px;
+      background: linear-gradient(90deg, transparent, var(--border-medium), transparent);
+    }
+
+    /* --- PACKAGES (3 cards) --- */
+    .packages-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 2px;
+    }
+    .pkg-card {
+      background: var(--bg-surface);
+      padding: 40px 32px;
+      border: 1px solid var(--border-subtle);
+      transition: border-color 0.3s, background 0.3s;
+      position: relative;
+    }
+    .pkg-card:first-child { border-radius: 12px 0 0 12px; }
+    .pkg-card:last-child { border-radius: 0 12px 12px 0; }
+    .pkg-card:hover {
+      border-color: var(--border-medium);
+      background: var(--bg-elevated);
+    }
+    .pkg-card .pkg-number {
+      font-family: var(--font-display);
+      font-size: 48px;
+      font-weight: 900;
+      color: var(--bg-elevated);
+      position: absolute;
+      top: 16px;
+      right: 20px;
+      line-height: 1;
+      transition: color 0.3s;
+    }
+    .pkg-card:hover .pkg-number { color: var(--gold-dim); }
+    .pkg-name {
+      font-family: var(--font-mono);
+      font-size: 13px;
+      color: var(--gold);
+      margin-bottom: 12px;
+      word-break: break-all;
+    }
+    .pkg-card h3 {
+      font-size: 20px;
+      font-weight: 700;
+      margin-bottom: 16px;
+      letter-spacing: -0.01em;
+    }
+    .pkg-desc {
+      font-size: 14px;
+      color: var(--text-secondary);
+      line-height: 1.7;
+      margin-bottom: 24px;
+    }
+    .pkg-features {
+      list-style: none;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+    .pkg-features li {
+      font-family: var(--font-mono);
+      font-size: 12px;
+      color: var(--text-secondary);
+      padding-left: 18px;
+      position: relative;
+    }
+    .pkg-features li::before {
+      content: '';
+      position: absolute;
+      left: 0;
+      top: 7px;
+      width: 6px;
+      height: 6px;
+      border-radius: 50%;
+      background: var(--gold);
+      opacity: 0.5;
+    }
+
+    /* --- TABLES --- */
+    .ref-table-wrap {
+      overflow-x: auto;
+      margin-bottom: 8px;
+    }
+    .ref-table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 14px;
+    }
+    .ref-table th {
+      text-align: left;
+      padding: 12px 16px;
+      font-family: var(--font-mono);
+      font-size: 11px;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      color: var(--gold);
+      background: var(--bg-elevated);
+      border-bottom: 1px solid var(--border-medium);
+      white-space: nowrap;
+    }
+    .ref-table th:first-child { border-radius: 8px 0 0 0; }
+    .ref-table th:last-child { border-radius: 0 8px 0 0; }
+    .ref-table td {
+      padding: 12px 16px;
+      border-bottom: 1px solid var(--border-subtle);
+      color: var(--text-secondary);
+      vertical-align: top;
+    }
+    .ref-table tr:last-child td { border-bottom: none; }
+    .ref-table tr:hover td {
+      background: var(--bg-surface);
+    }
+    .ref-table td:first-child {
+      color: var(--text-primary);
+      font-weight: 500;
+    }
+    .ref-table code {
+      font-family: var(--font-mono);
+      font-size: 12px;
+      background: var(--bg-surface);
+      border: 1px solid var(--border-subtle);
+      border-radius: 4px;
+      padding: 2px 6px;
+      color: var(--green);
+    }
+    .badge-yes {
+      font-family: var(--font-mono);
+      font-size: 11px;
+      color: var(--red);
+      background: rgba(248,113,113,0.12);
+      padding: 2px 8px;
+      border-radius: 4px;
+    }
+    .badge-no {
+      font-family: var(--font-mono);
+      font-size: 11px;
+      color: var(--text-tertiary);
+      background: var(--bg-surface);
+      padding: 2px 8px;
+      border-radius: 4px;
+    }
+    .badge-warn {
+      font-family: var(--font-mono);
+      font-size: 11px;
+      color: #febc2e;
+      background: rgba(254,188,46,0.12);
+      padding: 2px 8px;
+      border-radius: 4px;
+    }
+
+    /* --- GUIDELINES LIST --- */
+    .guidelines-list {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+      gap: 2px;
+    }
+    .guideline-item {
+      background: var(--bg-surface);
+      border: 1px solid var(--border-subtle);
+      padding: 20px 24px;
+      display: flex;
+      gap: 16px;
+      align-items: flex-start;
+      transition: background 0.3s;
+    }
+    .guideline-item:hover { background: var(--bg-elevated); }
+    .guideline-num {
+      flex-shrink: 0;
+      width: 32px;
+      height: 32px;
+      border-radius: 8px;
+      background: var(--gold-dim);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-family: var(--font-mono);
+      font-size: 12px;
+      font-weight: 700;
+      color: var(--gold);
+    }
+    .guideline-info h4 {
+      font-family: var(--font-mono);
+      font-size: 13px;
+      color: var(--text-primary);
+      margin-bottom: 4px;
+    }
+    .guideline-info p {
+      font-size: 13px;
+      color: var(--text-secondary);
+      line-height: 1.5;
+    }
+
+    /* --- AGENTS GRID --- */
+    .agents-grid {
+      display: grid;
+      grid-template-columns: repeat(5, 1fr);
+      gap: 2px;
+    }
+    .agent-card {
+      background: var(--bg-surface);
+      border: 1px solid var(--border-subtle);
+      padding: 28px 20px;
+      text-align: center;
+      transition: background 0.3s, border-color 0.3s;
+    }
+    .agent-card:first-child { border-radius: 12px 0 0 12px; }
+    .agent-card:last-child { border-radius: 0 12px 12px 0; }
+    .agent-card:hover {
+      background: var(--bg-elevated);
+      border-color: var(--border-medium);
+    }
+    .agent-card h4 {
+      font-size: 15px;
+      font-weight: 600;
+      margin-bottom: 10px;
+    }
+    .agent-card .agent-file {
+      font-family: var(--font-mono);
+      font-size: 11px;
+      color: var(--green);
+      background: var(--bg-elevated);
+      border: 1px solid var(--border-subtle);
+      border-radius: 4px;
+      padding: 4px 8px;
+      display: inline-block;
+    }
+
+    /* --- MCP CARDS --- */
+    .mcp-grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 2px;
+    }
+    .mcp-card {
+      background: var(--bg-surface);
+      border: 1px solid var(--border-subtle);
+      padding: 32px 28px;
+      transition: background 0.3s, border-color 0.3s;
+    }
+    .mcp-card:nth-child(1) { border-radius: 12px 0 0 0; }
+    .mcp-card:nth-child(2) { border-radius: 0 12px 0 0; }
+    .mcp-card:nth-child(3) { border-radius: 0 0 0 12px; }
+    .mcp-card:nth-child(4) { border-radius: 0 0 12px 0; }
+    .mcp-card:hover {
+      background: var(--bg-elevated);
+      border-color: var(--border-medium);
+    }
+    .mcp-badge {
+      display: inline-block;
+      font-family: var(--font-mono);
+      font-size: 10px;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      padding: 3px 10px;
+      border-radius: 100px;
+      margin-bottom: 14px;
+    }
+    .mcp-badge.required {
+      color: var(--gold);
+      background: var(--gold-dim);
+      border: 1px solid rgba(191,161,95,0.25);
+    }
+    .mcp-badge.optional {
+      color: var(--blue);
+      background: var(--blue-dim);
+      border: 1px solid rgba(74,158,255,0.2);
+    }
+    .mcp-card h4 {
+      font-size: 17px;
+      font-weight: 600;
+      margin-bottom: 10px;
+    }
+    .mcp-card p {
+      font-size: 13px;
+      color: var(--text-secondary);
+      line-height: 1.6;
+    }
+    .mcp-card ul {
+      list-style: none;
+      margin-top: 14px;
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+    }
+    .mcp-card ul li {
+      font-size: 13px;
+      color: var(--text-secondary);
+      padding-left: 16px;
+      position: relative;
+    }
+    .mcp-card ul li::before {
+      content: '';
+      position: absolute;
+      left: 0;
+      top: 7px;
+      width: 5px;
+      height: 5px;
+      border-radius: 50%;
+      background: var(--gold);
+      opacity: 0.4;
+    }
+
+    /* --- CODE BLOCK --- */
+    .code-block {
+      background: var(--bg-surface);
+      border: 1px solid var(--border-medium);
+      border-radius: 12px;
+      overflow: hidden;
+      margin-bottom: 8px;
+    }
+    .code-block-header {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      padding: 12px 16px;
+      background: var(--bg-elevated);
+      border-bottom: 1px solid var(--border-subtle);
+    }
+    .code-block-dot {
+      width: 10px;
+      height: 10px;
+      border-radius: 50%;
+    }
+    .code-block-dot:nth-child(1) { background: #ff5f57; }
+    .code-block-dot:nth-child(2) { background: #febc2e; }
+    .code-block-dot:nth-child(3) { background: #28c840; }
+    .code-block-title {
+      flex: 1;
+      text-align: center;
+      font-family: var(--font-mono);
+      font-size: 11px;
+      color: var(--text-tertiary);
+    }
+    .code-block-body {
+      padding: 20px;
+      font-family: var(--font-mono);
+      font-size: 13px;
+      line-height: 1.8;
+      color: var(--text-secondary);
+      overflow-x: auto;
+    }
+    .code-block-body .key { color: var(--blue); }
+    .code-block-body .str { color: var(--green); }
+    .code-block-body .bool { color: #febc2e; }
+    .code-block-body .num { color: var(--gold); }
+    .code-block-body .comment { color: var(--text-tertiary); }
+
+    /* --- ENV VARS LIST --- */
+    .env-list {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      margin-top: 16px;
+    }
+    .env-var {
+      font-family: var(--font-mono);
+      font-size: 11px;
+      color: var(--text-secondary);
+      background: var(--bg-surface);
+      border: 1px solid var(--border-subtle);
+      padding: 4px 12px;
+      border-radius: 6px;
+    }
+
+    /* --- MCP TOOLS LIST --- */
+    .tools-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+      gap: 2px;
+    }
+    .tool-item {
+      background: var(--bg-surface);
+      border: 1px solid var(--border-subtle);
+      padding: 16px 20px;
+      display: flex;
+      gap: 14px;
+      align-items: flex-start;
+      transition: background 0.3s;
+    }
+    .tool-item:hover { background: var(--bg-elevated); }
+    .tool-num {
+      flex-shrink: 0;
+      font-family: var(--font-mono);
+      font-size: 11px;
+      color: var(--text-tertiary);
+      padding-top: 2px;
+    }
+    .tool-item h4 {
+      font-family: var(--font-mono);
+      font-size: 13px;
+      color: var(--gold);
+      margin-bottom: 4px;
+    }
+    .tool-item p {
+      font-size: 13px;
+      color: var(--text-secondary);
+    }
+
+    /* --- CATALOG TABLES --- */
+    .catalog-section-title {
+      font-family: var(--font-mono);
+      font-size: 12px;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      color: var(--gold);
+      margin-bottom: 16px;
+      margin-top: 40px;
+    }
+    .catalog-section-title:first-child { margin-top: 0; }
+
+    /* --- MARKERS NOTE --- */
+    .note-box {
+      background: var(--bg-surface);
+      border: 1px solid var(--border-subtle);
+      border-left: 3px solid var(--gold);
+      border-radius: 0 8px 8px 0;
+      padding: 20px 24px;
+      margin-top: 24px;
+    }
+    .note-box p {
+      font-size: 14px;
+      color: var(--text-secondary);
+      line-height: 1.7;
+    }
+    .note-box code {
+      font-family: var(--font-mono);
+      font-size: 12px;
+      background: var(--bg-elevated);
+      border: 1px solid var(--border-subtle);
+      border-radius: 4px;
+      padding: 2px 6px;
+      color: var(--green);
+    }
+
+    /* --- FOOTER --- */
+    footer {
+      border-top: 1px solid var(--border-subtle);
+      padding: 48px 0;
+    }
+    footer .container {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    .footer-left {
+      font-size: 13px;
+      color: var(--text-tertiary);
+    }
+    .footer-left strong {
+      color: var(--text-secondary);
+      font-weight: 500;
+    }
+    .footer-links {
+      display: flex;
+      gap: 24px;
+    }
+    .footer-links a {
+      font-size: 13px;
+      color: var(--text-tertiary);
+    }
+    .footer-links a:hover { color: var(--text-primary); }
+
+    /* --- ANIMATIONS --- */
+    @keyframes fadeUp {
+      from { opacity: 0; transform: translateY(24px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+    .animate-in {
+      opacity: 0;
+      animation: fadeUp 0.6s ease-out forwards;
+    }
+    .delay-1 { animation-delay: 0.1s; }
+    .delay-2 { animation-delay: 0.2s; }
+
+    /* --- RESPONSIVE --- */
+    @media (max-width: 900px) {
+      .packages-grid { grid-template-columns: 1fr; }
+      .pkg-card,
+      .pkg-card:first-child,
+      .pkg-card:last-child { border-radius: 12px; }
+      .agents-grid { grid-template-columns: repeat(2, 1fr); }
+      .agent-card,
+      .agent-card:first-child,
+      .agent-card:last-child { border-radius: 0; }
+      .mcp-grid { grid-template-columns: 1fr; }
+      .mcp-card,
+      .mcp-card:nth-child(1),
+      .mcp-card:nth-child(2),
+      .mcp-card:nth-child(3),
+      .mcp-card:nth-child(4) { border-radius: 0; }
+      .guidelines-list { grid-template-columns: 1fr; }
+      .tools-grid { grid-template-columns: 1fr; }
+    }
+    @media (max-width: 600px) {
+      .agents-grid { grid-template-columns: 1fr; }
+      .nav-links { display: none; }
+      footer .container { flex-direction: column; gap: 16px; text-align: center; }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- NAV -->
+  <nav>
+    <div class="container">
+      <div class="nav-brand"><span>geniova</span>/developer-kit</div>
+      <div class="nav-links">
+        <a href="index.html">Inicio</a>
+        <a href="onboarding.html">Onboarding</a>
+        <a href="pr-workflow.html">PR Workflow</a>
+        <a href="reference.html" class="active">Referencia</a>
+      </div>
+    </div>
+  </nav>
+
+  <!-- PAGE HEADER -->
+  <header class="page-header">
+    <div class="page-header-content">
+      <div class="hero-label animate-in">Documentacion completa</div>
+      <h1 class="animate-in delay-1">Referencia Tecnica</h1>
+      <p class="animate-in delay-2">Arquitectura de paquetes, git hooks, guidelines, agentes IA, MCPs, configuracion y catalogo de proyectos.</p>
+    </div>
+  </header>
+
+  <div class="divider"></div>
+
+  <!-- ARCHITECTURE: 3 PACKAGES -->
+  <section id="arquitectura">
+    <div class="container">
+      <div class="section-label">Tres paquetes, un ecosistema</div>
+      <h2 class="section-title">Arquitectura de 3 paquetes</h2>
+      <p class="section-subtitle">Cada paquete tiene una responsabilidad clara. El bootstrapper verifica, el wizard configura, los hooks protegen.</p>
+
+      <div class="packages-grid">
+        <div class="pkg-card">
+          <div class="pkg-number">01</div>
+          <div class="pkg-name">@geniova/developer-kit</div>
+          <h3>Bootstrapper</h3>
+          <p class="pkg-desc">Paquete publico en npm. Punto de entrada que verifica prerrequisitos y lanza el wizard privado.</p>
+          <ul class="pkg-features">
+            <li>Repo: geniova-developer-kit</li>
+            <li>Comando: npx @geniova/developer-kit init</li>
+            <li>node &gt;=18, pnpm, gh, firebase-tools</li>
+            <li>claude, karajan</li>
+            <li>Auth GitHub + membresia org</li>
+            <li>Auth Firebase CLI</li>
+          </ul>
+        </div>
+
+        <div class="pkg-card">
+          <div class="pkg-number">02</div>
+          <div class="pkg-name">@geniova-technologies/geniova-kit</div>
+          <h3>Wizard</h3>
+          <p class="pkg-desc">Paquete privado en GitHub Packages. Wizard interactivo que ejecuta el setup completo del proyecto.</p>
+          <ul class="pkg-features">
+            <li>Repo: geniova-kit (privado)</li>
+            <li>6 pasos de configuracion</li>
+            <li>Seleccion, clonado, dependencias</li>
+            <li>MCPs, hooks, configuracion</li>
+            <li>19 proyectos en el catalogo</li>
+            <li>Templates de .env por proyecto</li>
+          </ul>
+        </div>
+
+        <div class="pkg-card">
+          <div class="pkg-number">03</div>
+          <div class="pkg-name">@geniova/git-hooks</div>
+          <h3>Git Hooks</h3>
+          <p class="pkg-desc">Hooks, guidelines y MCP Server. Proteccion del repositorio y contexto para agentes IA.</p>
+          <ul class="pkg-features">
+            <li>Repo: geniova-git-hooks</li>
+            <li>Comandos: init, generate, run</li>
+            <li>8 checks automaticos</li>
+            <li>13 guidelines de codigo</li>
+            <li>5 agentes IA soportados</li>
+            <li>MCP Server con 8 herramientas</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <div class="divider"></div>
+
+  <!-- GIT HOOKS -->
+  <section id="hooks">
+    <div class="container">
+      <div class="section-label">Proteccion del repositorio</div>
+      <h2 class="section-title">Git Hooks</h2>
+      <p class="section-subtitle">8 checks automaticos que se ejecutan en pre-commit, commit-msg y pre-push para proteger la calidad del codigo.</p>
+
+      <div class="ref-table-wrap">
+        <table class="ref-table">
+          <thead>
+            <tr>
+              <th>Hook</th>
+              <th>Check</th>
+              <th>Descripcion</th>
+              <th>Bloquea</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td><code>pre-commit</code></td>
+              <td>Lint</td>
+              <td>ESLint + Stylelint en archivos staged</td>
+              <td><span class="badge-yes">Si</span></td>
+            </tr>
+            <tr>
+              <td><code>pre-commit</code></td>
+              <td>Regression</td>
+              <td>Detecta cambios CSS/JS que deshacen fixes previos</td>
+              <td><span class="badge-warn">Warning</span></td>
+            </tr>
+            <tr>
+              <td><code>pre-commit</code></td>
+              <td>No AI refs</td>
+              <td>Bloquea commits con referencias a IA en archivos</td>
+              <td><span class="badge-yes">Si</span></td>
+            </tr>
+            <tr>
+              <td><code>commit-msg</code></td>
+              <td>AI en mensaje</td>
+              <td>Valida que el mensaje de commit no mencione IA</td>
+              <td><span class="badge-yes">Si</span></td>
+            </tr>
+            <tr>
+              <td><code>pre-push</code></td>
+              <td>SSH</td>
+              <td>Valida que el remote usa SSH en lugar de HTTPS</td>
+              <td><span class="badge-yes">Si</span></td>
+            </tr>
+            <tr>
+              <td><code>pre-push</code></td>
+              <td>Identity</td>
+              <td>Verifica git user.email contra emails permitidos</td>
+              <td><span class="badge-yes">Si</span></td>
+            </tr>
+            <tr>
+              <td><code>pre-push</code></td>
+              <td>Rebase</td>
+              <td>Requiere rebase sobre origin/main antes de push</td>
+              <td><span class="badge-yes">Si</span></td>
+            </tr>
+            <tr>
+              <td><code>pre-push</code></td>
+              <td>Diff summary</td>
+              <td>Muestra estadisticas del push (archivos, lineas)</td>
+              <td><span class="badge-no">Info</span></td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </section>
+
+  <div class="divider"></div>
+
+  <!-- GUIDELINES -->
+  <section id="guidelines">
+    <div class="container">
+      <div class="section-label">Estandares de codigo</div>
+      <h2 class="section-title">Guidelines</h2>
+      <p class="section-subtitle">13 guias que definen los estandares de desarrollo para todos los proyectos Geniova.</p>
+
+      <div class="guidelines-list">
+        <div class="guideline-item">
+          <div class="guideline-num">1</div>
+          <div class="guideline-info">
+            <h4>code-style.md</h4>
+            <p>SOLID, DRY, KISS, YAGNI, vanilla JS + JSDoc</p>
+          </div>
+        </div>
+        <div class="guideline-item">
+          <div class="guideline-num">2</div>
+          <div class="guideline-info">
+            <h4>naming-conventions.md</h4>
+            <p>Archivos, variables, CSS, Firebase</p>
+          </div>
+        </div>
+        <div class="guideline-item">
+          <div class="guideline-num">3</div>
+          <div class="guideline-info">
+            <h4>error-handling.md</h4>
+            <p>Fallos explicitos, boundaries, logging</p>
+          </div>
+        </div>
+        <div class="guideline-item">
+          <div class="guideline-num">4</div>
+          <div class="guideline-info">
+            <h4>testing.md</h4>
+            <p>TDD, Vitest/Playwright, cobertura minima</p>
+          </div>
+        </div>
+        <div class="guideline-item">
+          <div class="guideline-num">5</div>
+          <div class="guideline-info">
+            <h4>security.md</h4>
+            <p>Validacion, secrets, Firebase rules</p>
+          </div>
+        </div>
+        <div class="guideline-item">
+          <div class="guideline-num">6</div>
+          <div class="guideline-info">
+            <h4>ui-ux.md</h4>
+            <p>Modales, toast, accesibilidad, responsive</p>
+          </div>
+        </div>
+        <div class="guideline-item">
+          <div class="guideline-num">7</div>
+          <div class="guideline-info">
+            <h4>commits-and-prs.md</h4>
+            <p>Conventional Commits, PRs pequenas</p>
+          </div>
+        </div>
+        <div class="guideline-item">
+          <div class="guideline-num">8</div>
+          <div class="guideline-info">
+            <h4>dependencies.md</h4>
+            <p>Evaluacion, versionado</p>
+          </div>
+        </div>
+        <div class="guideline-item">
+          <div class="guideline-num">9</div>
+          <div class="guideline-info">
+            <h4>implementation-plan.md</h4>
+            <p>Cuando y como planificar implementaciones</p>
+          </div>
+        </div>
+        <div class="guideline-item">
+          <div class="guideline-num">10</div>
+          <div class="guideline-info">
+            <h4>file-protection.md</h4>
+            <p>No sobreescrituras accidentales</p>
+          </div>
+        </div>
+        <div class="guideline-item">
+          <div class="guideline-num">11</div>
+          <div class="guideline-info">
+            <h4>firebase-patterns.md</h4>
+            <p>Colecciones, reglas, Cloud Functions</p>
+          </div>
+        </div>
+        <div class="guideline-item">
+          <div class="guideline-num">12</div>
+          <div class="guideline-info">
+            <h4>astro-lit-patterns.md</h4>
+            <p>SSG, View Transitions, Lit</p>
+          </div>
+        </div>
+        <div class="guideline-item">
+          <div class="guideline-num">13</div>
+          <div class="guideline-info">
+            <h4>git-firebase-identity.md</h4>
+            <p>Verificacion de identidad</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <div class="divider"></div>
+
+  <!-- AGENTS -->
+  <section id="agentes">
+    <div class="container">
+      <div class="section-label">Contexto para IA</div>
+      <h2 class="section-title">Agentes IA soportados</h2>
+      <p class="section-subtitle">Se generan archivos de guidelines especificos para cada agente. Usan marcadores para preservar contenido personalizado al regenerar.</p>
+
+      <div class="agents-grid">
+        <div class="agent-card">
+          <h4>Claude Code</h4>
+          <div class="agent-file">CLAUDE.md</div>
+        </div>
+        <div class="agent-card">
+          <h4>GitHub Copilot</h4>
+          <div class="agent-file">.github/copilot-instructions.md</div>
+        </div>
+        <div class="agent-card">
+          <h4>OpenAI Codex</h4>
+          <div class="agent-file">AGENTS.md</div>
+        </div>
+        <div class="agent-card">
+          <h4>Google Gemini</h4>
+          <div class="agent-file">.gemini/styleguide.md</div>
+        </div>
+        <div class="agent-card">
+          <h4>Cursor</h4>
+          <div class="agent-file">.cursorrules</div>
+        </div>
+      </div>
+
+      <div class="note-box">
+        <p>Los archivos generados usan marcadores <code>@geniova/git-hooks:start</code> y <code>@geniova/git-hooks:end</code> para delimitar el contenido gestionado. El contenido fuera de estos marcadores se preserva al regenerar con <code>generate</code>.</p>
+      </div>
+    </div>
+  </section>
+
+  <div class="divider"></div>
+
+  <!-- MCPs -->
+  <section id="mcps">
+    <div class="container">
+      <div class="section-label">Integraciones</div>
+      <h2 class="section-title">MCPs disponibles</h2>
+      <p class="section-subtitle">Model Context Protocol servers que se configuran automaticamente durante el setup del proyecto.</p>
+
+      <div class="mcp-grid">
+        <div class="mcp-card">
+          <div class="mcp-badge required">Obligatorio</div>
+          <h4>Planning Game</h4>
+          <p>Gestion de proyectos agiles basada en eXtreme Programming.</p>
+          <ul>
+            <li>Cards: tasks, bugs, epics, proposals, QA</li>
+            <li>Sprints, developers, stakeholders</li>
+            <li>ADRs (Architecture Decision Records)</li>
+            <li>Integracion con todos los agentes IA</li>
+          </ul>
+        </div>
+        <div class="mcp-card">
+          <div class="mcp-badge required">Obligatorio</div>
+          <h4>Karajan</h4>
+          <p>Orquestacion multi-agente para desarrollo y review.</p>
+          <ul>
+            <li>Roles: Coder, Reviewer, Solomon, Tester, Security</li>
+            <li>Code review con BecarIA integration</li>
+            <li>PR-oriented pipeline</li>
+            <li>Ejecucion local con keys del developer</li>
+          </ul>
+        </div>
+        <div class="mcp-card">
+          <div class="mcp-badge optional">Opcional</div>
+          <h4>Chrome DevTools</h4>
+          <p>Verificacion visual y depuracion desde el agente IA.</p>
+          <ul>
+            <li>Screenshots y snapshots de UI</li>
+            <li>Consola y network debugging</li>
+            <li>Pruebas de interaccion de usuario</li>
+            <li>Validacion responsive y accesibilidad</li>
+          </ul>
+        </div>
+        <div class="mcp-card">
+          <div class="mcp-badge optional">Opcional</div>
+          <h4>SonarQube</h4>
+          <p>Analisis estatico de calidad de codigo.</p>
+          <ul>
+            <li>Code smells, bugs, vulnerabilidades</li>
+            <li>Quality gates por proyecto</li>
+            <li>Ejecucion local con Docker</li>
+            <li>Integracion con npx @sonar/scan</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <div class="divider"></div>
+
+  <!-- CONFIG -->
+  <section id="configuracion">
+    <div class="container">
+      <div class="section-label">Personalizacion</div>
+      <h2 class="section-title">Configuracion: .githooksrc.json</h2>
+      <p class="section-subtitle">Archivo de configuracion en la raiz del proyecto para personalizar el comportamiento de los hooks y checks.</p>
+
+      <div class="code-block">
+        <div class="code-block-header">
+          <div class="code-block-dot"></div>
+          <div class="code-block-dot"></div>
+          <div class="code-block-dot"></div>
+          <div class="code-block-title">.githooksrc.json</div>
+        </div>
+        <div class="code-block-body"><pre>{
+  <span class="key">"historyDepth"</span>: <span class="num">10</span>,
+  <span class="key">"lint"</span>: { <span class="key">"enabled"</span>: <span class="bool">true</span> },
+  <span class="key">"regression"</span>: { <span class="key">"enabled"</span>: <span class="bool">true</span>, <span class="key">"maxFiles"</span>: <span class="num">20</span> },
+  <span class="key">"aiRefs"</span>: {
+    <span class="key">"enabled"</span>: <span class="bool">true</span>,
+    <span class="key">"extraPatterns"</span>: [],
+    <span class="key">"allowInFiles"</span>: [<span class="str">".claude/*"</span>]
+  },
+  <span class="key">"commitMsg"</span>: { <span class="key">"enabled"</span>: <span class="bool">true</span> },
+  <span class="key">"push"</span>: {
+    <span class="key">"enabled"</span>: <span class="bool">true</span>,
+    <span class="key">"allowedEmails"</span>: [<span class="str">"*@geniova.com"</span>],
+    <span class="key">"rebaseCheck"</span>: <span class="bool">true</span>,
+    <span class="key">"diffSummary"</span>: <span class="bool">true</span>,
+    <span class="key">"baseBranch"</span>: <span class="str">"main"</span>,
+    <span class="key">"maxLines"</span>: <span class="num">300</span>
+  }
+}</pre></div>
+      </div>
+
+      <div class="section-label" style="margin-top: 48px;">Variables de entorno</div>
+      <p style="font-size: 14px; color: var(--text-secondary); margin-bottom: 16px;">Cada opcion de configuracion puede ser sobreescrita con variables de entorno:</p>
+      <div class="env-list">
+        <span class="env-var">GENIOVA_HOOKS_LINT_ENABLED</span>
+        <span class="env-var">GENIOVA_HOOKS_REGRESSION_ENABLED</span>
+        <span class="env-var">GENIOVA_HOOKS_AIREFS_ENABLED</span>
+        <span class="env-var">GENIOVA_HOOKS_COMMITMSG_ENABLED</span>
+        <span class="env-var">GENIOVA_HOOKS_PUSH_ENABLED</span>
+        <span class="env-var">GENIOVA_HOOKS_PUSH_REBASECHECK</span>
+        <span class="env-var">GENIOVA_HOOKS_PUSH_DIFFSUMMARY</span>
+        <span class="env-var">GENIOVA_HOOKS_PUSH_MAXLINES</span>
+      </div>
+    </div>
+  </section>
+
+  <div class="divider"></div>
+
+  <!-- MCP SERVER TOOLS -->
+  <section id="mcp-tools">
+    <div class="container">
+      <div class="section-label">MCP Server de git-hooks</div>
+      <h2 class="section-title">8 herramientas</h2>
+      <p class="section-subtitle">Herramientas expuestas por el MCP Server de @geniova/git-hooks para integracion con agentes IA.</p>
+
+      <div class="tools-grid">
+        <div class="tool-item">
+          <div class="tool-num">01</div>
+          <div>
+            <h4>init_project</h4>
+            <p>Setup completo en directorio</p>
+          </div>
+        </div>
+        <div class="tool-item">
+          <div class="tool-num">02</div>
+          <div>
+            <h4>generate_guidelines</h4>
+            <p>Regenerar archivos de guidelines</p>
+          </div>
+        </div>
+        <div class="tool-item">
+          <div class="tool-num">03</div>
+          <div>
+            <h4>list_guidelines</h4>
+            <p>Listar guidelines disponibles</p>
+          </div>
+        </div>
+        <div class="tool-item">
+          <div class="tool-num">04</div>
+          <div>
+            <h4>get_guideline</h4>
+            <p>Obtener contenido de una guia</p>
+          </div>
+        </div>
+        <div class="tool-item">
+          <div class="tool-num">05</div>
+          <div>
+            <h4>get_full_guidelines</h4>
+            <p>Todas las guias concatenadas</p>
+          </div>
+        </div>
+        <div class="tool-item">
+          <div class="tool-num">06</div>
+          <div>
+            <h4>list_targets</h4>
+            <p>Listar agentes soportados</p>
+          </div>
+        </div>
+        <div class="tool-item">
+          <div class="tool-num">07</div>
+          <div>
+            <h4>get_project_config</h4>
+            <p>Obtener .githooksrc.json</p>
+          </div>
+        </div>
+        <div class="tool-item">
+          <div class="tool-num">08</div>
+          <div>
+            <h4>run_hook</h4>
+            <p>Ejecutar un hook manualmente</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <div class="divider"></div>
+
+  <!-- CATALOG -->
+  <section id="catalogo">
+    <div class="container">
+      <div class="section-label">19 proyectos</div>
+      <h2 class="section-title">Catalogo de proyectos</h2>
+      <p class="section-subtitle">Todos los proyectos disponibles en el wizard del Developer Kit, organizados por area.</p>
+
+      <div class="catalog-section-title">Plataforma dental</div>
+      <div class="ref-table-wrap">
+        <table class="ref-table">
+          <thead>
+            <tr>
+              <th>Proyecto</th>
+              <th>Abrev</th>
+              <th>Stack</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>Extranet V2</td>
+              <td><code>EX2</code></td>
+              <td>Next, Tailwind, TypeScript</td>
+            </tr>
+            <tr>
+              <td>Intranet</td>
+              <td><code>NTR</code></td>
+              <td>Next, Tailwind, Firebase, TypeScript</td>
+            </tr>
+            <tr>
+              <td>Intranet-Extended</td>
+              <td><code>IEX</code></td>
+              <td>Next, Firebase, JavaScript</td>
+            </tr>
+            <tr>
+              <td>Visor-Editor</td>
+              <td><code>VSR</code></td>
+              <td>Next, Three.js, JavaScript</td>
+            </tr>
+            <tr>
+              <td>Cinema4D</td>
+              <td><code>C4D</code></td>
+              <td>Python</td>
+            </tr>
+            <tr>
+              <td>Geniova Platform</td>
+              <td><code>PLT</code></td>
+              <td>Astro, Lit, Firebase, JS</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <div class="catalog-section-title">Herramientas internas</div>
+      <div class="ref-table-wrap">
+        <table class="ref-table">
+          <thead>
+            <tr>
+              <th>Proyecto</th>
+              <th>Abrev</th>
+              <th>Stack</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>PlanningGame</td>
+              <td><code>PLN</code></td>
+              <td>Astro, Lit, Firebase, JS</td>
+            </tr>
+            <tr>
+              <td>Planning Game MCP</td>
+              <td><code>PMC</code></td>
+              <td>Node.js, MCP SDK, Firebase, Vitest</td>
+            </tr>
+            <tr>
+              <td>Portal Incidencias</td>
+              <td><code>PRT</code></td>
+              <td>Astro, Lit, Firebase, JS</td>
+            </tr>
+            <tr>
+              <td>Auth&amp;Sign</td>
+              <td><code>A&amp;S</code></td>
+              <td>Astro, Lit, Firebase, JS</td>
+            </tr>
+            <tr>
+              <td>Inventario</td>
+              <td><code>NVN</code></td>
+              <td>Astro, Lit, Firebase, JS</td>
+            </tr>
+            <tr>
+              <td>Geniova Space</td>
+              <td><code>GSP</code></td>
+              <td>Astro, Lit, Firebase, JS</td>
+            </tr>
+            <tr>
+              <td>Geniova Link</td>
+              <td><code>GNL</code></td>
+              <td>Astro, Lit, JS</td>
+            </tr>
+            <tr>
+              <td>Firestore-Myadmin</td>
+              <td><code>FMA</code></td>
+              <td>Lit, Web Components, Firebase</td>
+            </tr>
+            <tr>
+              <td>Web Geniova</td>
+              <td><code>WGN</code></td>
+              <td>WordPress, Lit, Vite, PHP</td>
+            </tr>
+            <tr>
+              <td>Geniova Employee</td>
+              <td><code>GEM</code></td>
+              <td>Astro, Lit, Firebase, JS</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <div class="catalog-section-title">Gestion</div>
+      <div class="ref-table-wrap">
+        <table class="ref-table">
+          <thead>
+            <tr>
+              <th>Proyecto</th>
+              <th>Abrev</th>
+              <th>Stack</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>Geniova Kit</td>
+              <td><code>GKT</code></td>
+              <td>Node.js, JavaScript</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </section>
+
+  <!-- FOOTER -->
+  <footer>
+    <div class="container">
+      <div class="footer-left">
+        <strong>Geniova Technologies</strong> &mdash; 2026
+      </div>
+      <div class="footer-links">
+        <a href="index.html">Inicio</a>
+        <a href="onboarding.html">Onboarding</a>
+        <a href="pr-workflow.html">PR Workflow</a>
+      </div>
+    </div>
+  </footer>
+
+  <!-- Scroll animations -->
+  <script>
+    const observer = new IntersectionObserver((entries) => {
+      entries.forEach(entry => {
+        if (entry.isIntersecting) {
+          entry.target.style.opacity = '1';
+          entry.target.style.transform = 'translateY(0)';
+        }
+      });
+    }, { threshold: 0.1, rootMargin: '0px 0px -40px 0px' });
+
+    document.querySelectorAll('.pkg-card, .guideline-item, .agent-card, .mcp-card, .tool-item, .ref-table-wrap, .code-block, .note-box').forEach((el, i) => {
+      el.style.opacity = '0';
+      el.style.transform = 'translateY(20px)';
+      el.style.transition = 'opacity 0.5s ease ' + (i * 0.03) + 's, transform 0.5s ease ' + (i * 0.03) + 's';
+      observer.observe(el);
+    });
+  </script>
+
+</body>
+</html>

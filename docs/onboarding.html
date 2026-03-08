@@ -1,0 +1,932 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Geniova Developer Kit — Guia de Onboarding</title>
+  <meta name="description" content="Guia paso a paso para configurar tu entorno de desarrollo con Geniova Developer Kit. Prerrequisitos, instalacion, MCPs y flujo de trabajo diario.">
+  <meta property="og:title" content="Geniova Developer Kit — Onboarding">
+  <meta property="og:description" content="Guia paso a paso para nuevos desarrolladores de Geniova Technologies.">
+  <meta property="og:type" content="website">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,wght@0,300;0,400;0,500;0,700&family=JetBrains+Mono:wght@400;500;700&family=Playfair+Display:wght@700;900&display=swap" rel="stylesheet">
+  <style>
+    *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+
+    :root {
+      --bg-deep: #08080c;
+      --bg-primary: #0f0f13;
+      --bg-surface: #16161d;
+      --bg-elevated: #1e1e28;
+      --bg-hover: #252532;
+      --border-subtle: rgba(255,255,255,0.06);
+      --border-medium: rgba(255,255,255,0.1);
+      --gold: #bfa15f;
+      --gold-dim: rgba(191,161,95,0.15);
+      --gold-glow: rgba(191,161,95,0.08);
+      --blue: #4a9eff;
+      --blue-dim: rgba(74,158,255,0.12);
+      --green: #34d399;
+      --green-dim: rgba(52,211,153,0.12);
+      --red: #f87171;
+      --text-primary: #e8e6e3;
+      --text-secondary: #8a8a97;
+      --text-tertiary: #55555f;
+      --font-body: 'DM Sans', sans-serif;
+      --font-display: 'Playfair Display', serif;
+      --font-mono: 'JetBrains Mono', monospace;
+    }
+
+    html { scroll-behavior: smooth; }
+
+    body {
+      font-family: var(--font-body);
+      background: var(--bg-deep);
+      color: var(--text-primary);
+      line-height: 1.6;
+      -webkit-font-smoothing: antialiased;
+      overflow-x: hidden;
+    }
+
+    /* --- Noise overlay --- */
+    body::before {
+      content: '';
+      position: fixed;
+      inset: 0;
+      background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.03'/%3E%3C/svg%3E");
+      pointer-events: none;
+      z-index: 9999;
+    }
+
+    .container {
+      max-width: 1120px;
+      margin: 0 auto;
+      padding: 0 24px;
+    }
+
+    a { color: var(--gold); text-decoration: none; transition: color 0.2s; }
+    a:hover { color: var(--text-primary); }
+
+    /* --- NAV --- */
+    nav {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      z-index: 100;
+      padding: 16px 0;
+      background: rgba(8,8,12,0.85);
+      backdrop-filter: blur(20px);
+      border-bottom: 1px solid var(--border-subtle);
+    }
+    nav .container {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+    .nav-brand {
+      font-family: var(--font-mono);
+      font-size: 14px;
+      font-weight: 500;
+      color: var(--text-primary);
+      letter-spacing: -0.02em;
+    }
+    .nav-brand span { color: var(--gold); }
+    .nav-links { display: flex; gap: 32px; }
+    .nav-links a {
+      font-size: 13px;
+      color: var(--text-secondary);
+      letter-spacing: 0.02em;
+      text-transform: uppercase;
+      font-weight: 500;
+    }
+    .nav-links a:hover { color: var(--text-primary); }
+    .nav-links a.active { color: var(--gold); }
+
+    /* --- PAGE HEADER --- */
+    .page-header {
+      padding: 140px 0 80px;
+      position: relative;
+      text-align: center;
+    }
+    .page-header::before {
+      content: '';
+      position: absolute;
+      top: -20%;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 800px;
+      height: 600px;
+      background: radial-gradient(ellipse, var(--gold-glow) 0%, transparent 70%);
+      pointer-events: none;
+    }
+    .page-header-content {
+      position: relative;
+      z-index: 1;
+    }
+    .page-header .hero-label {
+      display: inline-block;
+      font-family: var(--font-mono);
+      font-size: 11px;
+      letter-spacing: 0.15em;
+      text-transform: uppercase;
+      color: var(--gold);
+      border: 1px solid var(--gold-dim);
+      background: var(--gold-dim);
+      padding: 6px 16px;
+      border-radius: 100px;
+      margin-bottom: 24px;
+    }
+    .page-header h1 {
+      font-family: var(--font-display);
+      font-size: clamp(36px, 5vw, 56px);
+      font-weight: 900;
+      line-height: 1.1;
+      letter-spacing: -0.03em;
+      margin-bottom: 20px;
+      background: linear-gradient(135deg, var(--text-primary) 0%, var(--gold) 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+    .page-header p {
+      font-size: 18px;
+      color: var(--text-secondary);
+      max-width: 560px;
+      margin: 0 auto;
+      line-height: 1.7;
+    }
+
+    /* --- SECTIONS --- */
+    section { padding: 80px 0; position: relative; }
+
+    .section-label {
+      font-family: var(--font-mono);
+      font-size: 11px;
+      letter-spacing: 0.15em;
+      text-transform: uppercase;
+      color: var(--gold);
+      margin-bottom: 16px;
+    }
+    .section-title {
+      font-family: var(--font-display);
+      font-size: clamp(28px, 3.5vw, 40px);
+      font-weight: 700;
+      line-height: 1.15;
+      letter-spacing: -0.02em;
+      margin-bottom: 20px;
+    }
+    .section-subtitle {
+      font-size: 16px;
+      color: var(--text-secondary);
+      max-width: 560px;
+      line-height: 1.7;
+      margin-bottom: 48px;
+    }
+
+    /* Separator */
+    .divider {
+      height: 1px;
+      background: linear-gradient(90deg, transparent, var(--border-medium), transparent);
+    }
+
+    /* --- PREREQ GRID --- */
+    .prereq-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 2px;
+    }
+    .prereq-card {
+      background: var(--bg-surface);
+      padding: 28px 24px;
+      border: 1px solid var(--border-subtle);
+      transition: border-color 0.3s, background 0.3s;
+    }
+    .prereq-card:first-child { border-radius: 12px 0 0 0; }
+    .prereq-card:nth-child(3) { border-radius: 0 12px 0 0; }
+    .prereq-card:nth-child(4) { border-radius: 0 0 0 12px; }
+    .prereq-card:last-child { border-radius: 0 0 12px 0; }
+    .prereq-card:hover {
+      border-color: var(--border-medium);
+      background: var(--bg-elevated);
+    }
+    .prereq-card h3 {
+      font-size: 15px;
+      font-weight: 600;
+      margin-bottom: 8px;
+      letter-spacing: -0.01em;
+    }
+    .prereq-card .prereq-detail {
+      font-family: var(--font-mono);
+      font-size: 12px;
+      color: var(--gold);
+      margin-bottom: 8px;
+      word-break: break-all;
+    }
+    .prereq-card p {
+      font-size: 13px;
+      color: var(--text-secondary);
+      line-height: 1.6;
+    }
+    .prereq-icon {
+      width: 36px;
+      height: 36px;
+      border-radius: 8px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin-bottom: 14px;
+      font-family: var(--font-mono);
+      font-size: 13px;
+      font-weight: 700;
+    }
+    .prereq-icon.gold { background: var(--gold-dim); color: var(--gold); }
+    .prereq-icon.blue { background: var(--blue-dim); color: var(--blue); }
+    .prereq-icon.green { background: var(--green-dim); color: var(--green); }
+
+    /* --- STEPS --- */
+    .steps-list {
+      display: flex;
+      flex-direction: column;
+      gap: 0;
+      max-width: 760px;
+    }
+    .step-item {
+      display: flex;
+      gap: 24px;
+      align-items: flex-start;
+      padding: 36px 0;
+      border-bottom: 1px solid var(--border-subtle);
+    }
+    .step-item:last-child { border-bottom: none; }
+    .step-number {
+      flex-shrink: 0;
+      width: 48px;
+      height: 48px;
+      border-radius: 12px;
+      background: var(--bg-surface);
+      border: 1px solid var(--border-medium);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-family: var(--font-mono);
+      font-size: 16px;
+      font-weight: 700;
+      color: var(--gold);
+    }
+    .step-body h3 {
+      font-size: 18px;
+      font-weight: 600;
+      margin-bottom: 10px;
+      letter-spacing: -0.01em;
+    }
+    .step-body p {
+      font-size: 14px;
+      color: var(--text-secondary);
+      line-height: 1.7;
+      margin-bottom: 16px;
+    }
+    .step-body p:last-child { margin-bottom: 0; }
+
+    /* Terminal block */
+    .terminal {
+      background: var(--bg-surface);
+      border: 1px solid var(--border-medium);
+      border-radius: 12px;
+      overflow: hidden;
+      text-align: left;
+      max-width: 520px;
+      box-shadow: 0 16px 60px rgba(0,0,0,0.3);
+      margin-top: 4px;
+    }
+    .terminal-bar {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      padding: 12px 16px;
+      background: var(--bg-elevated);
+      border-bottom: 1px solid var(--border-subtle);
+    }
+    .terminal-dot {
+      width: 10px;
+      height: 10px;
+      border-radius: 50%;
+      background: var(--text-tertiary);
+    }
+    .terminal-dot:nth-child(1) { background: #ff5f57; }
+    .terminal-dot:nth-child(2) { background: #febc2e; }
+    .terminal-dot:nth-child(3) { background: #28c840; }
+    .terminal-title {
+      flex: 1;
+      text-align: center;
+      font-family: var(--font-mono);
+      font-size: 11px;
+      color: var(--text-tertiary);
+    }
+    .terminal-body {
+      padding: 20px;
+      font-family: var(--font-mono);
+      font-size: 13px;
+      line-height: 2;
+    }
+    .terminal-body .prompt { color: var(--green); }
+    .terminal-body .cmd { color: var(--text-primary); }
+    .terminal-body .flag { color: var(--blue); }
+    .terminal-body .output { color: var(--text-tertiary); }
+    .terminal-body .success { color: var(--gold); }
+
+    /* Code inline */
+    .code-inline {
+      display: inline-block;
+      background: var(--bg-surface);
+      border: 1px solid var(--border-subtle);
+      border-radius: 6px;
+      padding: 8px 16px;
+      font-family: var(--font-mono);
+      font-size: 13px;
+      color: var(--green);
+    }
+
+    /* Detail lists inside steps */
+    .step-detail-list {
+      list-style: none;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      margin-bottom: 16px;
+    }
+    .step-detail-list li {
+      font-size: 14px;
+      color: var(--text-secondary);
+      padding-left: 18px;
+      position: relative;
+      line-height: 1.6;
+    }
+    .step-detail-list li::before {
+      content: '';
+      position: absolute;
+      left: 0;
+      top: 8px;
+      width: 6px;
+      height: 6px;
+      border-radius: 50%;
+      background: var(--gold);
+      opacity: 0.5;
+    }
+    .step-detail-list li strong {
+      color: var(--text-primary);
+      font-weight: 600;
+    }
+    .step-detail-list li .mono {
+      font-family: var(--font-mono);
+      font-size: 12px;
+      color: var(--gold);
+    }
+
+    /* MCP tags */
+    .mcp-group {
+      margin-bottom: 16px;
+    }
+    .mcp-group-title {
+      font-family: var(--font-mono);
+      font-size: 12px;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      color: var(--text-tertiary);
+      margin-bottom: 10px;
+    }
+    .mcp-tags {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+    }
+    .mcp-tag {
+      background: var(--bg-surface);
+      border: 1px solid var(--border-medium);
+      border-radius: 8px;
+      padding: 10px 16px;
+      font-size: 13px;
+      transition: border-color 0.3s;
+    }
+    .mcp-tag:hover { border-color: var(--gold); }
+    .mcp-tag .mcp-tag-name {
+      font-weight: 600;
+      color: var(--text-primary);
+      display: block;
+      margin-bottom: 2px;
+    }
+    .mcp-tag .mcp-tag-desc {
+      font-size: 12px;
+      color: var(--text-secondary);
+    }
+    .mcp-tag.required { border-color: var(--green-dim); }
+    .mcp-tag.required .mcp-tag-name { color: var(--green); }
+    .mcp-tag.optional { border-style: dashed; }
+
+    /* --- WORKFLOW --- */
+    .workflow-pipeline {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      justify-content: center;
+      gap: 0;
+      margin-top: 32px;
+    }
+    .workflow-step {
+      display: flex;
+      align-items: center;
+      gap: 0;
+    }
+    .wf-node {
+      background: var(--bg-surface);
+      border: 1px solid var(--border-medium);
+      padding: 14px 20px;
+      border-radius: 8px;
+      text-align: center;
+      transition: border-color 0.3s, color 0.3s;
+    }
+    .wf-node:hover {
+      border-color: var(--gold);
+    }
+    .wf-node .wf-number {
+      font-family: var(--font-mono);
+      font-size: 11px;
+      color: var(--gold);
+      display: block;
+      margin-bottom: 4px;
+    }
+    .wf-node .wf-label {
+      font-size: 12px;
+      color: var(--text-secondary);
+      font-weight: 500;
+    }
+    .wf-arrow {
+      color: var(--text-tertiary);
+      font-size: 18px;
+      padding: 0 8px;
+      flex-shrink: 0;
+    }
+
+    /* --- FOOTER --- */
+    footer {
+      border-top: 1px solid var(--border-subtle);
+      padding: 48px 0;
+    }
+    footer .container {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    .footer-left {
+      font-size: 13px;
+      color: var(--text-tertiary);
+    }
+    .footer-left strong {
+      color: var(--text-secondary);
+      font-weight: 500;
+    }
+    .footer-links {
+      display: flex;
+      gap: 24px;
+    }
+    .footer-links a {
+      font-size: 13px;
+      color: var(--text-tertiary);
+    }
+    .footer-links a:hover { color: var(--text-primary); }
+
+    /* --- ANIMATIONS --- */
+    @keyframes fadeUp {
+      from { opacity: 0; transform: translateY(24px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+    .animate-in {
+      opacity: 0;
+      animation: fadeUp 0.6s ease-out forwards;
+    }
+    .delay-1 { animation-delay: 0.1s; }
+    .delay-2 { animation-delay: 0.2s; }
+    .delay-3 { animation-delay: 0.3s; }
+
+    /* --- RESPONSIVE --- */
+    @media (max-width: 900px) {
+      .prereq-grid { grid-template-columns: repeat(2, 1fr); }
+      .prereq-card,
+      .prereq-card:first-child,
+      .prereq-card:nth-child(3),
+      .prereq-card:nth-child(4),
+      .prereq-card:last-child { border-radius: 0; }
+      .workflow-pipeline { gap: 8px; }
+      .wf-arrow { display: none; }
+      .wf-node { font-size: 11px; padding: 10px 14px; }
+    }
+    @media (max-width: 600px) {
+      .prereq-grid { grid-template-columns: 1fr; }
+      .prereq-card,
+      .prereq-card:first-child,
+      .prereq-card:nth-child(3),
+      .prereq-card:nth-child(4),
+      .prereq-card:last-child { border-radius: 12px; }
+      .nav-links { display: none; }
+      footer .container { flex-direction: column; gap: 16px; text-align: center; }
+      .step-item { flex-direction: column; gap: 16px; }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- NAV -->
+  <nav>
+    <div class="container">
+      <div class="nav-brand"><span>geniova</span>/developer-kit</div>
+      <div class="nav-links">
+        <a href="index.html">&#8592; Inicio</a>
+        <a href="onboarding.html" class="active">Onboarding</a>
+        <a href="pr-workflow.html">PR Workflow</a>
+        <a href="reference.html">Referencia</a>
+      </div>
+    </div>
+  </nav>
+
+  <!-- PAGE HEADER -->
+  <header class="page-header">
+    <div class="page-header-content">
+      <div class="hero-label animate-in">Paso a paso</div>
+      <h1 class="animate-in delay-1">Guia de Onboarding</h1>
+      <p class="animate-in delay-2">Todo lo que necesitas para configurar tu entorno de desarrollo en Geniova Technologies, desde los prerrequisitos hasta tu primer <code style="font-family:var(--font-mono);color:var(--green);font-size:inherit">pnpm dev</code>.</p>
+    </div>
+  </header>
+
+  <div class="divider"></div>
+
+  <!-- PREREQUISITES -->
+  <section id="prerrequisitos">
+    <div class="container">
+      <div class="section-label">Antes de empezar</div>
+      <h2 class="section-title">Prerrequisitos</h2>
+      <p class="section-subtitle">Necesitas estas herramientas instaladas y configuradas en tu maquina antes de ejecutar el bootstrapper.</p>
+
+      <div class="prereq-grid">
+        <div class="prereq-card">
+          <div class="prereq-icon green">Nd</div>
+          <h3>Node.js</h3>
+          <div class="prereq-detail">>= 18</div>
+          <p>Instalar desde <a href="https://nodejs.org/">nodejs.org</a> o usando <a href="https://github.com/nvm-sh/nvm">nvm</a> para gestionar multiples versiones.</p>
+        </div>
+        <div class="prereq-card">
+          <div class="prereq-icon gold">pm</div>
+          <h3>pnpm</h3>
+          <div class="prereq-detail">npm install -g pnpm</div>
+          <p>Gestor de paquetes rapido y eficiente. Obligatorio para todos los proyectos Geniova.</p>
+        </div>
+        <div class="prereq-card">
+          <div class="prereq-icon blue">gh</div>
+          <h3>GitHub CLI</h3>
+          <div class="prereq-detail">gh auth login</div>
+          <p>Instalar desde <a href="https://cli.github.com/">cli.github.com</a>. Debe estar autenticado con acceso a la org Geniova-Technologies.</p>
+        </div>
+        <div class="prereq-card">
+          <div class="prereq-icon gold">fb</div>
+          <h3>Firebase CLI</h3>
+          <div class="prereq-detail">npm install -g firebase-tools</div>
+          <p>Herramientas de Firebase. Autenticar con <code style="font-family:var(--font-mono);font-size:12px;color:var(--green)">firebase login</code> usando la cuenta Geniova.</p>
+        </div>
+        <div class="prereq-card">
+          <div class="prereq-icon green">cc</div>
+          <h3>Claude Code</h3>
+          <div class="prereq-detail">npm install -g @anthropic-ai/claude-code</div>
+          <p>Agente de IA para desarrollo. Requiere licencia proporcionada por Geniova Technologies.</p>
+        </div>
+        <div class="prereq-card">
+          <div class="prereq-icon blue">kj</div>
+          <h3>Karajan</h3>
+          <div class="prereq-detail">npm install -g karajan-code</div>
+          <p>Orquestador de agentes IA. Requiere Claude (obligatorio). Codex y Gemini son opcionales (cuentas personales gratuitas).</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <div class="divider"></div>
+
+  <!-- STEPS -->
+  <section id="pasos">
+    <div class="container">
+      <div class="section-label">Configuracion</div>
+      <h2 class="section-title">Pasos de instalacion</h2>
+      <p class="section-subtitle">Un unico comando inicia todo el proceso. Cada paso se ejecuta de forma secuencial y verifica el resultado antes de continuar.</p>
+
+      <div class="steps-list">
+
+        <!-- Paso 1 -->
+        <div class="step-item">
+          <div class="step-number">1</div>
+          <div class="step-body">
+            <h3>Ejecutar el bootstrapper</h3>
+            <p>El punto de entrada publico verifica que tu maquina cumple todos los prerrequisitos, valida la autenticacion con GitHub y Firebase, y confirma la pertenencia a la organizacion Geniova-Technologies.</p>
+            <div class="terminal">
+              <div class="terminal-bar">
+                <div class="terminal-dot"></div>
+                <div class="terminal-dot"></div>
+                <div class="terminal-dot"></div>
+                <div class="terminal-title">Terminal</div>
+              </div>
+              <div class="terminal-body">
+                <div><span class="prompt">$</span> <span class="cmd">npx</span> <span class="flag">@geniova/developer-kit</span> <span class="cmd">init</span></div>
+                <div><span class="output">&nbsp;</span></div>
+                <div><span class="success">&#10003;</span> <span class="output">Node.js v22.14.0</span></div>
+                <div><span class="success">&#10003;</span> <span class="output">pnpm 10.6.2</span></div>
+                <div><span class="success">&#10003;</span> <span class="output">gh authenticated</span></div>
+                <div><span class="success">&#10003;</span> <span class="output">firebase authenticated</span></div>
+                <div><span class="success">&#10003;</span> <span class="output">Miembro de Geniova-Technologies</span></div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Paso 2 -->
+        <div class="step-item">
+          <div class="step-number">2</div>
+          <div class="step-body">
+            <h3>Seleccionar proyecto</h3>
+            <p>El wizard muestra los 19 proyectos disponibles organizados por categoria. Selecciona el proyecto en el que vas a trabajar.</p>
+            <ul class="step-detail-list">
+              <li><strong>Plataforma dental</strong> &mdash; 6 proyectos (Extranet V2, Intranet, Intranet-Extended, Visor-Editor, Cinema4D, Geniova Platform)</li>
+              <li><strong>Herramientas internas</strong> &mdash; 10 proyectos (PlanningGame, Planning Game MCP, Portal de Incidencias, Auth&amp;Sign, Inventario, Geniova Space, Geniova Link, Firestore-Myadmin, Web Geniova, Geniova Employee)</li>
+              <li><strong>Gestion y soporte</strong> &mdash; IT, IA, Desarrollos en SAP, Marketing</li>
+            </ul>
+            <div class="terminal">
+              <div class="terminal-bar">
+                <div class="terminal-dot"></div>
+                <div class="terminal-dot"></div>
+                <div class="terminal-dot"></div>
+                <div class="terminal-title">Terminal</div>
+              </div>
+              <div class="terminal-body">
+                <div><span class="output">? Selecciona categoria:</span></div>
+                <div><span class="success">&gt;</span> <span class="cmd">Herramientas internas</span></div>
+                <div><span class="output">&nbsp;</span></div>
+                <div><span class="output">? Selecciona proyecto:</span></div>
+                <div><span class="success">&gt;</span> <span class="cmd">Geniova Employee</span></div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Paso 3 -->
+        <div class="step-item">
+          <div class="step-number">3</div>
+          <div class="step-body">
+            <h3>Clonar e instalar</h3>
+            <p>El wizard clona el repositorio en el directorio estandar y ejecuta la instalacion de dependencias automaticamente.</p>
+            <ul class="step-detail-list">
+              <li>Clona el repo en <span class="mono">~/ws_geniova/{proyecto}</span></li>
+              <li>Ejecuta <span class="mono">pnpm install</span> para instalar todas las dependencias</li>
+              <li>Para proyectos con autenticacion, instala el SDK <span class="mono">@geniova/auth</span> desde el repositorio local</li>
+            </ul>
+          </div>
+        </div>
+
+        <!-- Paso 4 -->
+        <div class="step-item">
+          <div class="step-number">4</div>
+          <div class="step-body">
+            <h3>Configurar MCPs</h3>
+            <p>Los MCPs (Model Context Protocol Servers) conectan las herramientas de IA con los servicios del proyecto. Se instalan en la configuracion de Claude Code.</p>
+
+            <div class="mcp-group">
+              <div class="mcp-group-title">Obligatorios (automaticos)</div>
+              <div class="mcp-tags">
+                <div class="mcp-tag required">
+                  <span class="mcp-tag-name">Planning Game</span>
+                  <span class="mcp-tag-desc">Gestion de proyectos XP</span>
+                </div>
+                <div class="mcp-tag required">
+                  <span class="mcp-tag-name">Karajan</span>
+                  <span class="mcp-tag-desc">Orquestacion de agentes y code review</span>
+                </div>
+              </div>
+            </div>
+
+            <div class="mcp-group">
+              <div class="mcp-group-title">Opcionales (propuestos al usuario)</div>
+              <div class="mcp-tags">
+                <div class="mcp-tag optional">
+                  <span class="mcp-tag-name">Chrome DevTools</span>
+                  <span class="mcp-tag-desc">Verificacion visual, screenshots, debugging</span>
+                </div>
+                <div class="mcp-tag optional">
+                  <span class="mcp-tag-name">SonarQube</span>
+                  <span class="mcp-tag-desc">Analisis de calidad de codigo</span>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Paso 5 -->
+        <div class="step-item">
+          <div class="step-number">5</div>
+          <div class="step-body">
+            <h3>Git Hooks y Guidelines</h3>
+            <p>Se ejecuta el paquete de hooks que protege el repositorio con checks automaticos e instala guidelines para todos los agentes de IA soportados.</p>
+            <div class="terminal">
+              <div class="terminal-bar">
+                <div class="terminal-dot"></div>
+                <div class="terminal-dot"></div>
+                <div class="terminal-dot"></div>
+                <div class="terminal-title">Terminal</div>
+              </div>
+              <div class="terminal-body">
+                <div><span class="prompt">$</span> <span class="cmd">npx</span> <span class="flag">@geniova/git-hooks</span> <span class="cmd">init</span></div>
+                <div><span class="output">&nbsp;</span></div>
+                <div><span class="success">&#10003;</span> <span class="output">Husky instalado (3 hooks)</span></div>
+                <div><span class="output">&nbsp;&nbsp;</span><span class="output">pre-commit, commit-msg, pre-push</span></div>
+                <div><span class="success">&#10003;</span> <span class="output">Guidelines generados (5 agentes)</span></div>
+                <div><span class="output">&nbsp;&nbsp;</span><span class="output">CLAUDE.md, .cursorrules, copilot, gemini, codex</span></div>
+                <div><span class="success">&#10003;</span> <span class="output">GitHub Action no-ai-refs instalada</span></div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Paso 6 -->
+        <div class="step-item">
+          <div class="step-number">6</div>
+          <div class="step-body">
+            <h3>Configuracion</h3>
+            <p>El wizard genera el fichero <code style="font-family:var(--font-mono);font-size:13px;color:var(--green)">.env</code> con las variables de entorno del proyecto. Revisa los valores y completa los que aparezcan como pendientes.</p>
+            <ul class="step-detail-list">
+              <li>Genera <span class="mono">.env</span> con variables del proyecto (API keys, Firebase config, endpoints)</li>
+              <li>Muestra un resumen con el estado de la configuracion y los proximos pasos recomendados</li>
+            </ul>
+          </div>
+        </div>
+
+        <!-- Paso 7 -->
+        <div class="step-item">
+          <div class="step-number">7</div>
+          <div class="step-body">
+            <h3>Verificar</h3>
+            <p>Comprueba que todo funciona correctamente ejecutando el servidor de desarrollo, los tests y el linter.</p>
+            <div class="terminal">
+              <div class="terminal-bar">
+                <div class="terminal-dot"></div>
+                <div class="terminal-dot"></div>
+                <div class="terminal-dot"></div>
+                <div class="terminal-title">Terminal</div>
+              </div>
+              <div class="terminal-body">
+                <div><span class="prompt">$</span> <span class="cmd">cd</span> <span class="flag">~/ws_geniova/{proyecto}</span></div>
+                <div><span class="prompt">$</span> <span class="cmd">pnpm</span> <span class="flag">dev</span> <span class="output">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;# Servidor de desarrollo</span></div>
+                <div><span class="prompt">$</span> <span class="cmd">pnpm</span> <span class="flag">test</span> <span class="output">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;# Tests</span></div>
+                <div><span class="prompt">$</span> <span class="cmd">pnpm</span> <span class="flag">lint</span> <span class="output">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;# Linting</span></div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </section>
+
+  <div class="divider"></div>
+
+  <!-- DAILY WORKFLOW -->
+  <section id="workflow">
+    <div class="container">
+      <div class="section-label">Dia a dia</div>
+      <h2 class="section-title">Flujo de trabajo diario</h2>
+      <p class="section-subtitle">Una vez configurado el entorno, este es el flujo que seguiras para cada tarea o bug. Todas las tareas pasan por Planning Game y Pull Request.</p>
+
+      <div class="workflow-pipeline">
+        <div class="workflow-step">
+          <div class="wf-node">
+            <span class="wf-number">01</span>
+            <span class="wf-label">Crear / asignar card</span>
+          </div>
+          <div class="wf-arrow">&rarr;</div>
+        </div>
+        <div class="workflow-step">
+          <div class="wf-node">
+            <span class="wf-number">02</span>
+            <span class="wf-label">Crear rama</span>
+          </div>
+          <div class="wf-arrow">&rarr;</div>
+        </div>
+        <div class="workflow-step">
+          <div class="wf-node">
+            <span class="wf-number">03</span>
+            <span class="wf-label">Implementar</span>
+          </div>
+          <div class="wf-arrow">&rarr;</div>
+        </div>
+        <div class="workflow-step">
+          <div class="wf-node">
+            <span class="wf-number">04</span>
+            <span class="wf-label">Push + PR</span>
+          </div>
+          <div class="wf-arrow">&rarr;</div>
+        </div>
+        <div class="workflow-step">
+          <div class="wf-node">
+            <span class="wf-number">05</span>
+            <span class="wf-label">Review</span>
+          </div>
+          <div class="wf-arrow">&rarr;</div>
+        </div>
+        <div class="workflow-step">
+          <div class="wf-node">
+            <span class="wf-number">06</span>
+            <span class="wf-label">Merge</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="steps-list" style="margin-top:48px">
+        <div class="step-item">
+          <div class="step-number">1</div>
+          <div class="step-body">
+            <h3>Crear o asignar card en Planning Game</h3>
+            <p>Toda tarea debe tener una card antes de empezar a trabajar. Puede ser una task o un bug. Si no existe, crearla con titulo, descripcion estructurada y criterios de aceptacion.</p>
+          </div>
+        </div>
+        <div class="step-item">
+          <div class="step-number">2</div>
+          <div class="step-body">
+            <h3>Crear rama</h3>
+            <p>Siempre trabajar en una rama dedicada. Nunca hacer push directo a main.</p>
+            <ul class="step-detail-list">
+              <li>Features: <span class="mono">feat/PRJ-TSK-XXXX-descripcion</span></li>
+              <li>Bugs: <span class="mono">fix/PRJ-BUG-XXXX-descripcion</span></li>
+            </ul>
+          </div>
+        </div>
+        <div class="step-item">
+          <div class="step-number">3</div>
+          <div class="step-body">
+            <h3>Implementar con commits pequenos</h3>
+            <p>Seguir Conventional Commits (<span class="mono">feat:</span>, <span class="mono">fix:</span>, <span class="mono">refactor:</span>, <span class="mono">test:</span>, <span class="mono">docs:</span>, <span class="mono">chore:</span>). Ejecutar tests despues de cada cambio significativo. Maximo 300 lineas por PR.</p>
+          </div>
+        </div>
+        <div class="step-item">
+          <div class="step-number">4</div>
+          <div class="step-body">
+            <h3>Push y crear Pull Request hacia main</h3>
+            <p>La PR debe ser atomica: un solo proposito. Incluir descripcion clara de los cambios y referencia a la card del Planning Game.</p>
+          </div>
+        </div>
+        <div class="step-item">
+          <div class="step-number">5</div>
+          <div class="step-body">
+            <h3>Review por BecarIA y companero</h3>
+            <p>Karajan ejecuta el review en local y BecarIA publica el resultado como GitHub App. Un companero del equipo debe aprobar tambien antes del merge.</p>
+          </div>
+        </div>
+        <div class="step-item">
+          <div class="step-number">6</div>
+          <div class="step-body">
+            <h3>Merge tras aprobacion</h3>
+            <p>Con la aprobacion de BecarIA y un companero, y el CI en verde, la PR se mergea a main. Si tiene el label <span class="mono">automerge</span>, se mergea automaticamente.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- FOOTER -->
+  <footer>
+    <div class="container">
+      <div class="footer-left">
+        <strong>Geniova Technologies</strong> &mdash; 2026
+      </div>
+      <div class="footer-links">
+        <a href="index.html">Inicio</a>
+        <a href="pr-workflow.html">PR Workflow</a>
+        <a href="reference.html">Referencia</a>
+      </div>
+    </div>
+  </footer>
+
+  <!-- Scroll animations -->
+  <script>
+    const observer = new IntersectionObserver((entries) => {
+      entries.forEach(entry => {
+        if (entry.isIntersecting) {
+          entry.target.style.opacity = '1';
+          entry.target.style.transform = 'translateY(0)';
+        }
+      });
+    }, { threshold: 0.1, rootMargin: '0px 0px -40px 0px' });
+
+    document.querySelectorAll('.prereq-card, .step-item, .mcp-tag, .wf-node').forEach((el, i) => {
+      el.style.opacity = '0';
+      el.style.transform = 'translateY(20px)';
+      el.style.transition = `opacity 0.5s ease ${i * 0.05}s, transform 0.5s ease ${i * 0.05}s`;
+      observer.observe(el);
+    });
+  </script>
+
+</body>
+</html>
