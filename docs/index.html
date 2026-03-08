@@ -1,0 +1,886 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Geniova Developer Kit — Tu entorno, listo en un comando</title>
+  <meta name="description" content="Toolkit oficial de Geniova Technologies para configurar entornos de desarrollo. Prerrequisitos, MCPs, git hooks y AI review en un solo comando.">
+  <meta property="og:title" content="Geniova Developer Kit">
+  <meta property="og:description" content="Tu entorno de desarrollo, listo en un comando.">
+  <meta property="og:type" content="website">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,wght@0,300;0,400;0,500;0,700&family=JetBrains+Mono:wght@400;500;700&family=Playfair+Display:wght@700;900&display=swap" rel="stylesheet">
+  <style>
+    *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+
+    :root {
+      --bg-deep: #08080c;
+      --bg-primary: #0f0f13;
+      --bg-surface: #16161d;
+      --bg-elevated: #1e1e28;
+      --bg-hover: #252532;
+      --border-subtle: rgba(255,255,255,0.06);
+      --border-medium: rgba(255,255,255,0.1);
+      --gold: #bfa15f;
+      --gold-dim: rgba(191,161,95,0.15);
+      --gold-glow: rgba(191,161,95,0.08);
+      --blue: #4a9eff;
+      --blue-dim: rgba(74,158,255,0.12);
+      --green: #34d399;
+      --green-dim: rgba(52,211,153,0.12);
+      --red: #f87171;
+      --text-primary: #e8e6e3;
+      --text-secondary: #8a8a97;
+      --text-tertiary: #55555f;
+      --font-body: 'DM Sans', sans-serif;
+      --font-display: 'Playfair Display', serif;
+      --font-mono: 'JetBrains Mono', monospace;
+    }
+
+    html { scroll-behavior: smooth; }
+
+    body {
+      font-family: var(--font-body);
+      background: var(--bg-deep);
+      color: var(--text-primary);
+      line-height: 1.6;
+      -webkit-font-smoothing: antialiased;
+      overflow-x: hidden;
+    }
+
+    /* --- Noise overlay --- */
+    body::before {
+      content: '';
+      position: fixed;
+      inset: 0;
+      background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.03'/%3E%3C/svg%3E");
+      pointer-events: none;
+      z-index: 9999;
+    }
+
+    .container {
+      max-width: 1120px;
+      margin: 0 auto;
+      padding: 0 24px;
+    }
+
+    a { color: var(--gold); text-decoration: none; transition: color 0.2s; }
+    a:hover { color: var(--text-primary); }
+
+    /* --- NAV --- */
+    nav {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      z-index: 100;
+      padding: 16px 0;
+      background: rgba(8,8,12,0.85);
+      backdrop-filter: blur(20px);
+      border-bottom: 1px solid var(--border-subtle);
+    }
+    nav .container {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+    .nav-brand {
+      font-family: var(--font-mono);
+      font-size: 14px;
+      font-weight: 500;
+      color: var(--text-primary);
+      letter-spacing: -0.02em;
+    }
+    .nav-brand span { color: var(--gold); }
+    .nav-links { display: flex; gap: 32px; }
+    .nav-links a {
+      font-size: 13px;
+      color: var(--text-secondary);
+      letter-spacing: 0.02em;
+      text-transform: uppercase;
+      font-weight: 500;
+    }
+    .nav-links a:hover { color: var(--text-primary); }
+
+    /* --- HERO --- */
+    .hero {
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      text-align: center;
+      position: relative;
+      padding: 120px 24px 80px;
+    }
+    .hero::before {
+      content: '';
+      position: absolute;
+      top: -20%;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 800px;
+      height: 800px;
+      background: radial-gradient(ellipse, var(--gold-glow) 0%, transparent 70%);
+      pointer-events: none;
+    }
+    .hero-content { position: relative; z-index: 1; max-width: 720px; }
+    .hero-label {
+      display: inline-block;
+      font-family: var(--font-mono);
+      font-size: 11px;
+      letter-spacing: 0.15em;
+      text-transform: uppercase;
+      color: var(--gold);
+      border: 1px solid var(--gold-dim);
+      background: var(--gold-dim);
+      padding: 6px 16px;
+      border-radius: 100px;
+      margin-bottom: 32px;
+    }
+    .hero h1 {
+      font-family: var(--font-display);
+      font-size: clamp(42px, 7vw, 76px);
+      font-weight: 900;
+      line-height: 1.05;
+      letter-spacing: -0.03em;
+      margin-bottom: 24px;
+      background: linear-gradient(135deg, var(--text-primary) 0%, var(--gold) 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+    .hero p {
+      font-size: 18px;
+      color: var(--text-secondary);
+      max-width: 500px;
+      margin: 0 auto 48px;
+      line-height: 1.7;
+    }
+
+    /* Terminal block */
+    .terminal {
+      background: var(--bg-surface);
+      border: 1px solid var(--border-medium);
+      border-radius: 12px;
+      overflow: hidden;
+      text-align: left;
+      max-width: 520px;
+      margin: 0 auto;
+      box-shadow: 0 24px 80px rgba(0,0,0,0.4);
+    }
+    .terminal-bar {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      padding: 12px 16px;
+      background: var(--bg-elevated);
+      border-bottom: 1px solid var(--border-subtle);
+    }
+    .terminal-dot {
+      width: 10px;
+      height: 10px;
+      border-radius: 50%;
+      background: var(--text-tertiary);
+    }
+    .terminal-dot:nth-child(1) { background: #ff5f57; }
+    .terminal-dot:nth-child(2) { background: #febc2e; }
+    .terminal-dot:nth-child(3) { background: #28c840; }
+    .terminal-title {
+      flex: 1;
+      text-align: center;
+      font-family: var(--font-mono);
+      font-size: 11px;
+      color: var(--text-tertiary);
+    }
+    .terminal-body {
+      padding: 20px;
+      font-family: var(--font-mono);
+      font-size: 14px;
+      line-height: 2;
+    }
+    .terminal-body .prompt { color: var(--green); }
+    .terminal-body .cmd { color: var(--text-primary); }
+    .terminal-body .flag { color: var(--blue); }
+    .terminal-body .output { color: var(--text-tertiary); }
+    .terminal-body .success { color: var(--gold); }
+    .terminal-cursor {
+      display: inline-block;
+      width: 8px;
+      height: 16px;
+      background: var(--gold);
+      vertical-align: text-bottom;
+      animation: blink 1s step-end infinite;
+    }
+    @keyframes blink { 50% { opacity: 0; } }
+
+    /* --- SECTIONS --- */
+    section { padding: 120px 0; position: relative; }
+
+    .section-label {
+      font-family: var(--font-mono);
+      font-size: 11px;
+      letter-spacing: 0.15em;
+      text-transform: uppercase;
+      color: var(--gold);
+      margin-bottom: 16px;
+    }
+    .section-title {
+      font-family: var(--font-display);
+      font-size: clamp(32px, 4vw, 48px);
+      font-weight: 700;
+      line-height: 1.15;
+      letter-spacing: -0.02em;
+      margin-bottom: 20px;
+    }
+    .section-subtitle {
+      font-size: 17px;
+      color: var(--text-secondary);
+      max-width: 560px;
+      line-height: 1.7;
+      margin-bottom: 64px;
+    }
+
+    /* Separator */
+    .divider {
+      height: 1px;
+      background: linear-gradient(90deg, transparent, var(--border-medium), transparent);
+    }
+
+    /* --- PACKAGES (3 cards) --- */
+    .packages-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 2px;
+    }
+    .pkg-card {
+      background: var(--bg-surface);
+      padding: 40px 32px;
+      border: 1px solid var(--border-subtle);
+      transition: border-color 0.3s, background 0.3s;
+      position: relative;
+    }
+    .pkg-card:first-child { border-radius: 12px 0 0 12px; }
+    .pkg-card:last-child { border-radius: 0 12px 12px 0; }
+    .pkg-card:hover {
+      border-color: var(--border-medium);
+      background: var(--bg-elevated);
+    }
+    .pkg-card .pkg-number {
+      font-family: var(--font-display);
+      font-size: 48px;
+      font-weight: 900;
+      color: var(--bg-elevated);
+      position: absolute;
+      top: 16px;
+      right: 20px;
+      line-height: 1;
+      transition: color 0.3s;
+    }
+    .pkg-card:hover .pkg-number { color: var(--gold-dim); }
+    .pkg-name {
+      font-family: var(--font-mono);
+      font-size: 13px;
+      color: var(--gold);
+      margin-bottom: 12px;
+      word-break: break-all;
+    }
+    .pkg-card h3 {
+      font-size: 20px;
+      font-weight: 700;
+      margin-bottom: 16px;
+      letter-spacing: -0.01em;
+    }
+    .pkg-desc {
+      font-size: 14px;
+      color: var(--text-secondary);
+      line-height: 1.7;
+      margin-bottom: 24px;
+    }
+    .pkg-features {
+      list-style: none;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+    .pkg-features li {
+      font-family: var(--font-mono);
+      font-size: 12px;
+      color: var(--text-secondary);
+      padding-left: 18px;
+      position: relative;
+    }
+    .pkg-features li::before {
+      content: '';
+      position: absolute;
+      left: 0;
+      top: 7px;
+      width: 6px;
+      height: 6px;
+      border-radius: 50%;
+      background: var(--gold);
+      opacity: 0.5;
+    }
+
+    /* --- PIPELINE --- */
+    .pipeline {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      justify-content: center;
+      gap: 0;
+    }
+    .pipeline-step {
+      display: flex;
+      align-items: center;
+      gap: 0;
+    }
+    .step-node {
+      background: var(--bg-surface);
+      border: 1px solid var(--border-medium);
+      padding: 12px 20px;
+      border-radius: 8px;
+      font-family: var(--font-mono);
+      font-size: 12px;
+      color: var(--text-secondary);
+      white-space: nowrap;
+      transition: border-color 0.3s, color 0.3s;
+    }
+    .step-node:hover {
+      border-color: var(--gold);
+      color: var(--text-primary);
+    }
+    .step-arrow {
+      color: var(--text-tertiary);
+      font-size: 18px;
+      padding: 0 8px;
+      flex-shrink: 0;
+    }
+    .step-node.active {
+      border-color: var(--gold);
+      color: var(--gold);
+      background: var(--gold-dim);
+    }
+
+    /* --- FEATURES GRID --- */
+    .features-grid {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 2px;
+    }
+    .feature-cell {
+      background: var(--bg-surface);
+      padding: 32px 24px;
+      border: 1px solid var(--border-subtle);
+      transition: background 0.3s;
+    }
+    .feature-cell:nth-child(1) { border-radius: 12px 0 0 0; }
+    .feature-cell:nth-child(4) { border-radius: 0 12px 0 0; }
+    .feature-cell:nth-child(5) { border-radius: 0 0 0 12px; }
+    .feature-cell:nth-child(8) { border-radius: 0 0 12px 0; }
+    .feature-cell:hover { background: var(--bg-elevated); }
+    .feature-icon {
+      width: 36px;
+      height: 36px;
+      border-radius: 8px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin-bottom: 16px;
+      font-family: var(--font-mono);
+      font-size: 14px;
+      font-weight: 700;
+    }
+    .feature-icon.gold { background: var(--gold-dim); color: var(--gold); }
+    .feature-icon.blue { background: var(--blue-dim); color: var(--blue); }
+    .feature-icon.green { background: var(--green-dim); color: var(--green); }
+    .feature-cell h3 {
+      font-size: 15px;
+      font-weight: 600;
+      margin-bottom: 8px;
+      letter-spacing: -0.01em;
+    }
+    .feature-cell p {
+      font-size: 13px;
+      color: var(--text-secondary);
+      line-height: 1.6;
+    }
+
+    /* --- QUICK START --- */
+    .steps-list {
+      display: flex;
+      flex-direction: column;
+      gap: 32px;
+      max-width: 680px;
+    }
+    .qs-step {
+      display: flex;
+      gap: 24px;
+      align-items: flex-start;
+    }
+    .qs-number {
+      flex-shrink: 0;
+      width: 40px;
+      height: 40px;
+      border-radius: 10px;
+      background: var(--bg-surface);
+      border: 1px solid var(--border-medium);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-family: var(--font-mono);
+      font-size: 14px;
+      font-weight: 700;
+      color: var(--gold);
+    }
+    .qs-content h3 {
+      font-size: 16px;
+      font-weight: 600;
+      margin-bottom: 8px;
+    }
+    .qs-content p {
+      font-size: 14px;
+      color: var(--text-secondary);
+      margin-bottom: 12px;
+      line-height: 1.6;
+    }
+    .code-inline {
+      display: inline-block;
+      background: var(--bg-surface);
+      border: 1px solid var(--border-subtle);
+      border-radius: 6px;
+      padding: 8px 16px;
+      font-family: var(--font-mono);
+      font-size: 13px;
+      color: var(--green);
+    }
+
+    /* --- ARCHITECTURE --- */
+    .arch-diagram {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 0;
+      flex-wrap: wrap;
+      margin-top: 48px;
+    }
+    .arch-box {
+      background: var(--bg-surface);
+      border: 1px solid var(--border-medium);
+      border-radius: 12px;
+      padding: 32px 28px;
+      text-align: center;
+      min-width: 240px;
+      max-width: 280px;
+      flex: 1;
+      transition: border-color 0.3s;
+    }
+    .arch-box:hover { border-color: var(--gold); }
+    .arch-box .arch-label {
+      font-family: var(--font-mono);
+      font-size: 11px;
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      color: var(--text-tertiary);
+      margin-bottom: 8px;
+    }
+    .arch-box .arch-name {
+      font-family: var(--font-mono);
+      font-size: 13px;
+      color: var(--gold);
+      margin-bottom: 12px;
+      word-break: break-all;
+    }
+    .arch-box p {
+      font-size: 13px;
+      color: var(--text-secondary);
+      line-height: 1.5;
+    }
+    .arch-box.public { border-color: var(--green); border-style: solid; }
+    .arch-box.public .arch-label { color: var(--green); }
+    .arch-box.private { border-style: dashed; }
+    .arch-arrow {
+      font-size: 24px;
+      color: var(--text-tertiary);
+      padding: 0 16px;
+      flex-shrink: 0;
+    }
+
+    /* --- FOOTER --- */
+    footer {
+      border-top: 1px solid var(--border-subtle);
+      padding: 48px 0;
+    }
+    footer .container {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    .footer-left {
+      font-size: 13px;
+      color: var(--text-tertiary);
+    }
+    .footer-left strong {
+      color: var(--text-secondary);
+      font-weight: 500;
+    }
+    .footer-links {
+      display: flex;
+      gap: 24px;
+    }
+    .footer-links a {
+      font-size: 13px;
+      color: var(--text-tertiary);
+    }
+    .footer-links a:hover { color: var(--text-primary); }
+
+    /* --- ANIMATIONS --- */
+    @keyframes fadeUp {
+      from { opacity: 0; transform: translateY(24px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+    .animate-in {
+      opacity: 0;
+      animation: fadeUp 0.6s ease-out forwards;
+    }
+    .delay-1 { animation-delay: 0.1s; }
+    .delay-2 { animation-delay: 0.2s; }
+    .delay-3 { animation-delay: 0.3s; }
+    .delay-4 { animation-delay: 0.4s; }
+    .delay-5 { animation-delay: 0.5s; }
+
+    /* --- RESPONSIVE --- */
+    @media (max-width: 900px) {
+      .packages-grid { grid-template-columns: 1fr; }
+      .pkg-card,
+      .pkg-card:first-child,
+      .pkg-card:last-child { border-radius: 12px; }
+      .features-grid { grid-template-columns: repeat(2, 1fr); }
+      .feature-cell,
+      .feature-cell:nth-child(1),
+      .feature-cell:nth-child(4),
+      .feature-cell:nth-child(5),
+      .feature-cell:nth-child(8) { border-radius: 0; }
+      .arch-diagram { flex-direction: column; }
+      .arch-arrow { transform: rotate(90deg); padding: 8px 0; }
+      .pipeline { gap: 8px; }
+      .step-arrow { display: none; }
+      .step-node { font-size: 11px; padding: 8px 12px; }
+    }
+    @media (max-width: 600px) {
+      .features-grid { grid-template-columns: 1fr; }
+      .nav-links { display: none; }
+      footer .container { flex-direction: column; gap: 16px; text-align: center; }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- NAV -->
+  <nav>
+    <div class="container">
+      <div class="nav-brand"><span>geniova</span>/developer-kit</div>
+      <div class="nav-links">
+        <a href="#packages">Paquetes</a>
+        <a href="#features">Features</a>
+        <a href="#quickstart">Quick Start</a>
+        <a href="onboarding.html">Onboarding</a>
+        <a href="pr-workflow.html">PR Workflow</a>
+        <a href="reference.html">Referencia</a>
+        <a href="https://github.com/Geniova-Technologies/geniova-developer-kit">GitHub</a>
+      </div>
+    </div>
+  </nav>
+
+  <!-- HERO -->
+  <section class="hero">
+    <div class="hero-content">
+      <div class="hero-label animate-in">Geniova Technologies</div>
+      <h1 class="animate-in delay-1">Developer Kit</h1>
+      <p class="animate-in delay-2">Tu entorno de desarrollo, listo en un comando. Prerrequisitos, MCPs, git hooks, guidelines y AI review configurados en minutos.</p>
+      <div class="terminal animate-in delay-3">
+        <div class="terminal-bar">
+          <div class="terminal-dot"></div>
+          <div class="terminal-dot"></div>
+          <div class="terminal-dot"></div>
+          <div class="terminal-title">Terminal</div>
+        </div>
+        <div class="terminal-body">
+          <div><span class="prompt">$</span> <span class="cmd">npx</span> <span class="flag">@geniova/developer-kit</span> <span class="cmd">init</span></div>
+          <div><span class="output">&nbsp;</span></div>
+          <div><span class="success">&#10003;</span> <span class="output">Prerrequisitos verificados</span></div>
+          <div><span class="success">&#10003;</span> <span class="output">Autenticacion correcta</span></div>
+          <div><span class="success">&#10003;</span> <span class="output">Proyecto clonado</span></div>
+          <div><span class="success">&#10003;</span> <span class="output">MCPs configurados</span></div>
+          <div><span class="success">&#10003;</span> <span class="output">Hooks y guidelines instalados</span></div>
+          <div><span class="output">&nbsp;</span></div>
+          <div><span class="success">Configuracion completada!</span> <span class="terminal-cursor"></span></div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <div class="divider"></div>
+
+  <!-- PACKAGES -->
+  <section id="packages">
+    <div class="container">
+      <div class="section-label">Tres paquetes, un ecosistema</div>
+      <h2 class="section-title">Arquitectura modular</h2>
+      <p class="section-subtitle">Cada pieza tiene una responsabilidad clara. El bootstrapper verifica, el wizard configura, los hooks protegen.</p>
+
+      <div class="packages-grid">
+        <div class="pkg-card">
+          <div class="pkg-number">01</div>
+          <div class="pkg-name">@geniova/developer-kit</div>
+          <h3>Bootstrapper</h3>
+          <p class="pkg-desc">Punto de entrada publico. Verifica que tu maquina tiene todo lo necesario y lanza el wizard privado.</p>
+          <ul class="pkg-features">
+            <li>Node.js >= 18</li>
+            <li>pnpm, gh, firebase-tools</li>
+            <li>Claude Code + Karajan</li>
+            <li>Auth GitHub y Firebase</li>
+            <li>Pertenencia a la org</li>
+          </ul>
+        </div>
+
+        <div class="pkg-card">
+          <div class="pkg-number">02</div>
+          <div class="pkg-name">@geniova-technologies/geniova-kit</div>
+          <h3>Wizard</h3>
+          <p class="pkg-desc">Setup interactivo del proyecto. Selecciona, clona, instala y configura todo el entorno de desarrollo.</p>
+          <ul class="pkg-features">
+            <li>Catalogo de 18 proyectos</li>
+            <li>Clonar repo + dependencias</li>
+            <li>MCPs obligatorios y opcionales</li>
+            <li>Generar .env y configuracion</li>
+            <li>Paquete privado (GitHub Packages)</li>
+          </ul>
+        </div>
+
+        <div class="pkg-card">
+          <div class="pkg-number">03</div>
+          <div class="pkg-name">@geniova/git-hooks</div>
+          <h3>Git Hooks</h3>
+          <p class="pkg-desc">Proteccion del repositorio. Checks automaticos en cada commit, push y PR. Guidelines para 5 agentes IA.</p>
+          <ul class="pkg-features">
+            <li>8 checks (lint, AI refs, SSH...)</li>
+            <li>13 guidelines de codigo</li>
+            <li>5 agentes: Claude, Copilot, Codex, Gemini, Cursor</li>
+            <li>MCP Server con 8 tools</li>
+            <li>GitHub Action no-ai-refs</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <div class="divider"></div>
+
+  <!-- PIPELINE -->
+  <section id="pipeline">
+    <div class="container">
+      <div class="section-label">De cero a productivo</div>
+      <h2 class="section-title">Pipeline de setup</h2>
+      <p class="section-subtitle">Un unico comando ejecuta todo el pipeline. Cada paso verifica el anterior antes de continuar.</p>
+
+      <div class="pipeline">
+        <div class="pipeline-step">
+          <div class="step-node active">Prerequisites</div>
+          <div class="step-arrow">&rarr;</div>
+        </div>
+        <div class="pipeline-step">
+          <div class="step-node">Auth</div>
+          <div class="step-arrow">&rarr;</div>
+        </div>
+        <div class="pipeline-step">
+          <div class="step-node">Proyecto</div>
+          <div class="step-arrow">&rarr;</div>
+        </div>
+        <div class="pipeline-step">
+          <div class="step-node">Clone</div>
+          <div class="step-arrow">&rarr;</div>
+        </div>
+        <div class="pipeline-step">
+          <div class="step-node">Deps</div>
+          <div class="step-arrow">&rarr;</div>
+        </div>
+        <div class="pipeline-step">
+          <div class="step-node">MCPs</div>
+          <div class="step-arrow">&rarr;</div>
+        </div>
+        <div class="pipeline-step">
+          <div class="step-node">Hooks</div>
+          <div class="step-arrow">&rarr;</div>
+        </div>
+        <div class="pipeline-step">
+          <div class="step-node">Guidelines</div>
+          <div class="step-arrow">&rarr;</div>
+        </div>
+        <div class="pipeline-step">
+          <div class="step-node active">Ready</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <div class="divider"></div>
+
+  <!-- FEATURES -->
+  <section id="features">
+    <div class="container">
+      <div class="section-label">Incluido en el kit</div>
+      <h2 class="section-title">Todo lo que necesitas</h2>
+      <p class="section-subtitle">Herramientas, integraciones y automatizaciones para que el equipo se enfoque en construir, no en configurar.</p>
+
+      <div class="features-grid">
+        <div class="feature-cell">
+          <div class="feature-icon gold">BP</div>
+          <h3>Branch Protection</h3>
+          <p>PRs obligatorias, 1 aprobacion minima, dismiss stale reviews. Aplicable a todos los repos.</p>
+        </div>
+        <div class="feature-cell">
+          <div class="feature-icon blue">BR</div>
+          <h3>BecarIA Review</h3>
+          <p>AI Code Review via GitHub App. Karajan ejecuta en local, BecarIA publica APPROVE o REQUEST_CHANGES.</p>
+        </div>
+        <div class="feature-cell">
+          <div class="feature-icon green">AM</div>
+          <h3>Automerge</h3>
+          <p>Label automerge + aprobacion de BecarIA + CI verde = merge automatico por squash.</p>
+        </div>
+        <div class="feature-cell">
+          <div class="feature-icon gold">HO</div>
+          <h3>Houston Override</h3>
+          <p>Override de emergencia para IT. Label houston + comentario con razon = merge inmediato con audit trail.</p>
+        </div>
+        <div class="feature-cell">
+          <div class="feature-icon blue">KJ</div>
+          <h3>Karajan</h3>
+          <p>Pipeline AI completo: Coder, Reviewer, Solomon, Sonar. Todo en local con las keys del developer.</p>
+        </div>
+        <div class="feature-cell">
+          <div class="feature-icon green">PG</div>
+          <h3>Planning Game</h3>
+          <p>MCP integrado para gestion de tareas, sprints, bugs y estimaciones directamente desde el IDE.</p>
+        </div>
+        <div class="feature-cell">
+          <div class="feature-icon gold">SQ</div>
+          <h3>SonarQube</h3>
+          <p>Analisis de calidad integrado. Quality gates, coverage, code smells. Opcional pero recomendado.</p>
+        </div>
+        <div class="feature-cell">
+          <div class="feature-icon blue">18</div>
+          <h3>18 Proyectos</h3>
+          <p>Catalogo completo de Geniova: Extranet, Intranet, Visor 3D, PlanningGame, Auth, y mas.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <div class="divider"></div>
+
+  <!-- QUICK START -->
+  <section id="quickstart">
+    <div class="container">
+      <div class="section-label">Empezar</div>
+      <h2 class="section-title">Quick Start</h2>
+      <p class="section-subtitle">Tres pasos para tener tu entorno listo. Necesitas pertenecer a la organizacion Geniova-Technologies en GitHub.</p>
+
+      <div class="steps-list">
+        <div class="qs-step">
+          <div class="qs-number">1</div>
+          <div class="qs-content">
+            <h3>Ejecuta el bootstrapper</h3>
+            <p>Verifica prerrequisitos, autenticacion y lanza el wizard automaticamente.</p>
+            <div class="code-inline">npx @geniova/developer-kit init</div>
+          </div>
+        </div>
+
+        <div class="qs-step">
+          <div class="qs-number">2</div>
+          <div class="qs-content">
+            <h3>Selecciona tu proyecto</h3>
+            <p>El wizard muestra el catalogo de proyectos. Elige el tuyo y se clona, instala deps, configura MCPs y hooks.</p>
+            <div class="code-inline">? Selecciona proyecto: Extranet V2</div>
+          </div>
+        </div>
+
+        <div class="qs-step">
+          <div class="qs-number">3</div>
+          <div class="qs-content">
+            <h3>Empieza a trabajar</h3>
+            <p>Revisa el .env generado, completa los valores pendientes y comienza a desarrollar con todo configurado.</p>
+            <div class="code-inline">cd extranet-v2 && pnpm dev</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <div class="divider"></div>
+
+  <!-- ARCHITECTURE -->
+  <section id="architecture">
+    <div class="container">
+      <div class="section-label">Diseno</div>
+      <h2 class="section-title">Arquitectura</h2>
+      <p class="section-subtitle">El bootstrapper publico es la puerta de entrada. El wizard privado hace el trabajo. Los hooks protegen el resultado.</p>
+
+      <div class="arch-diagram">
+        <div class="arch-box public">
+          <div class="arch-label">Publico (npm)</div>
+          <div class="arch-name">@geniova/developer-kit</div>
+          <p>Verifica entorno y auth. Configura registry de GitHub Packages. Lanza el wizard.</p>
+        </div>
+        <div class="arch-arrow">&rarr;</div>
+        <div class="arch-box private">
+          <div class="arch-label">Privado (GitHub Packages)</div>
+          <div class="arch-name">@geniova-technologies/geniova-kit</div>
+          <p>Wizard interactivo. Setup completo del proyecto seleccionado.</p>
+        </div>
+        <div class="arch-arrow">&rarr;</div>
+        <div class="arch-box">
+          <div class="arch-label">Privado (GitHub)</div>
+          <div class="arch-name">@geniova/git-hooks</div>
+          <p>Hooks, checks, guidelines para todos los agentes IA. MCP Server.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- FOOTER -->
+  <footer>
+    <div class="container">
+      <div class="footer-left">
+        <strong>Geniova Technologies</strong> &mdash; 2026
+      </div>
+      <div class="footer-links">
+        <a href="https://github.com/Geniova-Technologies">GitHub</a>
+        <a href="https://www.npmjs.com/package/@geniova/developer-kit">npm</a>
+        <a href="https://geniova.com">geniova.com</a>
+      </div>
+    </div>
+  </footer>
+
+  <!-- Scroll animations -->
+  <script>
+    const observer = new IntersectionObserver((entries) => {
+      entries.forEach(entry => {
+        if (entry.isIntersecting) {
+          entry.target.style.opacity = '1';
+          entry.target.style.transform = 'translateY(0)';
+        }
+      });
+    }, { threshold: 0.1, rootMargin: '0px 0px -40px 0px' });
+
+    document.querySelectorAll('.pkg-card, .feature-cell, .qs-step, .arch-box').forEach((el, i) => {
+      el.style.opacity = '0';
+      el.style.transform = 'translateY(20px)';
+      el.style.transition = `opacity 0.5s ease ${i * 0.05}s, transform 0.5s ease ${i * 0.05}s`;
+      observer.observe(el);
+    });
+  </script>
+
+</body>
+</html>

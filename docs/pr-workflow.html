@@ -1,0 +1,1003 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Flujo de Pull Requests — Geniova Developer Kit</title>
+  <meta name="description" content="Documentacion del flujo de Pull Requests en Geniova Technologies. Branch protection, BecarIA review, automerge y houston override.">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,wght@0,300;0,400;0,500;0,700&family=JetBrains+Mono:wght@400;500;700&family=Playfair+Display:wght@700;900&display=swap" rel="stylesheet">
+  <style>
+    *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+
+    :root {
+      --bg-deep: #08080c;
+      --bg-primary: #0f0f13;
+      --bg-surface: #16161d;
+      --bg-elevated: #1e1e28;
+      --bg-hover: #252532;
+      --border-subtle: rgba(255,255,255,0.06);
+      --border-medium: rgba(255,255,255,0.1);
+      --gold: #bfa15f;
+      --gold-dim: rgba(191,161,95,0.15);
+      --gold-glow: rgba(191,161,95,0.08);
+      --blue: #4a9eff;
+      --blue-dim: rgba(74,158,255,0.12);
+      --green: #34d399;
+      --green-dim: rgba(52,211,153,0.12);
+      --red: #f87171;
+      --red-dim: rgba(248,113,113,0.12);
+      --orange: #fb923c;
+      --orange-dim: rgba(251,146,60,0.12);
+      --text-primary: #e8e6e3;
+      --text-secondary: #8a8a97;
+      --text-tertiary: #55555f;
+      --font-body: 'DM Sans', sans-serif;
+      --font-display: 'Playfair Display', serif;
+      --font-mono: 'JetBrains Mono', monospace;
+    }
+
+    html { scroll-behavior: smooth; }
+
+    body {
+      font-family: var(--font-body);
+      background: var(--bg-deep);
+      color: var(--text-primary);
+      line-height: 1.6;
+      -webkit-font-smoothing: antialiased;
+      overflow-x: hidden;
+    }
+
+    /* --- Noise overlay --- */
+    body::before {
+      content: '';
+      position: fixed;
+      inset: 0;
+      background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.03'/%3E%3C/svg%3E");
+      pointer-events: none;
+      z-index: 9999;
+    }
+
+    .container {
+      max-width: 1120px;
+      margin: 0 auto;
+      padding: 0 24px;
+    }
+
+    a { color: var(--gold); text-decoration: none; transition: color 0.2s; }
+    a:hover { color: var(--text-primary); }
+
+    /* --- NAV --- */
+    nav {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      z-index: 100;
+      padding: 16px 0;
+      background: rgba(8,8,12,0.85);
+      backdrop-filter: blur(20px);
+      border-bottom: 1px solid var(--border-subtle);
+    }
+    nav .container {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+    .nav-brand {
+      font-family: var(--font-mono);
+      font-size: 14px;
+      font-weight: 500;
+      color: var(--text-primary);
+      letter-spacing: -0.02em;
+    }
+    .nav-brand span { color: var(--gold); }
+    .nav-links { display: flex; gap: 32px; }
+    .nav-links a {
+      font-size: 13px;
+      color: var(--text-secondary);
+      letter-spacing: 0.02em;
+      text-transform: uppercase;
+      font-weight: 500;
+    }
+    .nav-links a:hover { color: var(--text-primary); }
+    .nav-links a.active {
+      color: var(--gold);
+    }
+
+    /* --- HERO (compact for doc pages) --- */
+    .hero {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      text-align: center;
+      position: relative;
+      padding: 140px 24px 80px;
+    }
+    .hero::before {
+      content: '';
+      position: absolute;
+      top: -20%;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 800px;
+      height: 600px;
+      background: radial-gradient(ellipse, var(--gold-glow) 0%, transparent 70%);
+      pointer-events: none;
+    }
+    .hero-content { position: relative; z-index: 1; max-width: 720px; }
+    .hero-label {
+      display: inline-block;
+      font-family: var(--font-mono);
+      font-size: 11px;
+      letter-spacing: 0.15em;
+      text-transform: uppercase;
+      color: var(--gold);
+      border: 1px solid var(--gold-dim);
+      background: var(--gold-dim);
+      padding: 6px 16px;
+      border-radius: 100px;
+      margin-bottom: 32px;
+    }
+    .hero h1 {
+      font-family: var(--font-display);
+      font-size: clamp(36px, 6vw, 64px);
+      font-weight: 900;
+      line-height: 1.05;
+      letter-spacing: -0.03em;
+      margin-bottom: 24px;
+      background: linear-gradient(135deg, var(--text-primary) 0%, var(--gold) 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+    .hero p {
+      font-size: 18px;
+      color: var(--text-secondary);
+      max-width: 540px;
+      margin: 0 auto;
+      line-height: 1.7;
+    }
+
+    /* --- SECTIONS --- */
+    section { padding: 100px 0; position: relative; }
+
+    .section-label {
+      font-family: var(--font-mono);
+      font-size: 11px;
+      letter-spacing: 0.15em;
+      text-transform: uppercase;
+      color: var(--gold);
+      margin-bottom: 16px;
+    }
+    .section-title {
+      font-family: var(--font-display);
+      font-size: clamp(28px, 4vw, 44px);
+      font-weight: 700;
+      line-height: 1.15;
+      letter-spacing: -0.02em;
+      margin-bottom: 20px;
+    }
+    .section-subtitle {
+      font-size: 17px;
+      color: var(--text-secondary);
+      max-width: 600px;
+      line-height: 1.7;
+      margin-bottom: 48px;
+    }
+
+    /* Separator */
+    .divider {
+      height: 1px;
+      background: linear-gradient(90deg, transparent, var(--border-medium), transparent);
+    }
+
+    /* --- RULE CALLOUT --- */
+    .rule-callout {
+      background: var(--bg-surface);
+      border: 1px solid var(--red);
+      border-left: 4px solid var(--red);
+      border-radius: 8px;
+      padding: 24px 28px;
+      margin-bottom: 48px;
+    }
+    .rule-callout h3 {
+      font-size: 16px;
+      font-weight: 700;
+      color: var(--red);
+      margin-bottom: 8px;
+    }
+    .rule-callout p {
+      font-size: 15px;
+      color: var(--text-secondary);
+      line-height: 1.6;
+    }
+
+    /* --- STEPS LIST --- */
+    .steps-list {
+      display: flex;
+      flex-direction: column;
+      gap: 28px;
+      max-width: 740px;
+    }
+    .qs-step {
+      display: flex;
+      gap: 24px;
+      align-items: flex-start;
+    }
+    .qs-number {
+      flex-shrink: 0;
+      width: 40px;
+      height: 40px;
+      border-radius: 10px;
+      background: var(--bg-surface);
+      border: 1px solid var(--border-medium);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-family: var(--font-mono);
+      font-size: 14px;
+      font-weight: 700;
+      color: var(--gold);
+    }
+    .qs-content h3 {
+      font-size: 16px;
+      font-weight: 600;
+      margin-bottom: 8px;
+    }
+    .qs-content p {
+      font-size: 14px;
+      color: var(--text-secondary);
+      margin-bottom: 12px;
+      line-height: 1.6;
+    }
+    .code-inline {
+      display: inline-block;
+      background: var(--bg-surface);
+      border: 1px solid var(--border-subtle);
+      border-radius: 6px;
+      padding: 8px 16px;
+      font-family: var(--font-mono);
+      font-size: 13px;
+      color: var(--green);
+      word-break: break-all;
+    }
+
+    /* --- INFO CARD --- */
+    .info-card {
+      background: var(--bg-surface);
+      border: 1px solid var(--border-subtle);
+      border-radius: 12px;
+      padding: 32px;
+      margin-bottom: 24px;
+      transition: border-color 0.3s, background 0.3s;
+    }
+    .info-card:hover {
+      border-color: var(--border-medium);
+      background: var(--bg-elevated);
+    }
+    .info-card h3 {
+      font-size: 18px;
+      font-weight: 700;
+      margin-bottom: 16px;
+      letter-spacing: -0.01em;
+    }
+    .info-card p {
+      font-size: 14px;
+      color: var(--text-secondary);
+      line-height: 1.7;
+      margin-bottom: 12px;
+    }
+    .info-card p:last-child { margin-bottom: 0; }
+
+    /* --- TWO COLUMN CARDS --- */
+    .cards-grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 24px;
+    }
+
+    /* --- FLOW STEPS (Karajan flow) --- */
+    .flow-steps {
+      list-style: none;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      margin-top: 8px;
+    }
+    .flow-steps li {
+      font-family: var(--font-mono);
+      font-size: 12px;
+      color: var(--text-secondary);
+      padding-left: 18px;
+      position: relative;
+      line-height: 1.8;
+    }
+    .flow-steps li::before {
+      content: '';
+      position: absolute;
+      left: 0;
+      top: 8px;
+      width: 6px;
+      height: 6px;
+      border-radius: 50%;
+      background: var(--gold);
+      opacity: 0.5;
+    }
+
+    /* --- REVIEW RULES GRID --- */
+    .rules-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 2px;
+    }
+    .rule-cell {
+      background: var(--bg-surface);
+      padding: 24px 20px;
+      border: 1px solid var(--border-subtle);
+      transition: background 0.3s;
+    }
+    .rule-cell:nth-child(1) { border-radius: 12px 0 0 0; }
+    .rule-cell:nth-child(3) { border-radius: 0 12px 0 0; }
+    .rule-cell:nth-child(7) { border-radius: 0 0 0 12px; }
+    .rule-cell:nth-child(9) { border-radius: 0 0 12px 0; }
+    .rule-cell:hover { background: var(--bg-elevated); }
+    .rule-icon {
+      width: 32px;
+      height: 32px;
+      border-radius: 6px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin-bottom: 12px;
+      font-family: var(--font-mono);
+      font-size: 12px;
+      font-weight: 700;
+    }
+    .rule-icon.gold { background: var(--gold-dim); color: var(--gold); }
+    .rule-icon.blue { background: var(--blue-dim); color: var(--blue); }
+    .rule-icon.green { background: var(--green-dim); color: var(--green); }
+    .rule-cell h4 {
+      font-size: 13px;
+      font-weight: 600;
+      margin-bottom: 6px;
+      letter-spacing: -0.01em;
+    }
+    .rule-cell p {
+      font-size: 12px;
+      color: var(--text-secondary);
+      line-height: 1.5;
+    }
+
+    /* --- LABEL CARDS --- */
+    .label-card {
+      background: var(--bg-surface);
+      border-radius: 12px;
+      padding: 32px;
+      border: 1px solid var(--border-subtle);
+      transition: border-color 0.3s, background 0.3s;
+    }
+    .label-card:hover {
+      border-color: var(--border-medium);
+      background: var(--bg-elevated);
+    }
+    .label-card.automerge { border-left: 4px solid var(--green); }
+    .label-card.houston { border-left: 4px solid var(--orange); }
+    .label-badge {
+      display: inline-block;
+      font-family: var(--font-mono);
+      font-size: 12px;
+      font-weight: 700;
+      padding: 4px 12px;
+      border-radius: 100px;
+      margin-bottom: 16px;
+    }
+    .label-badge.green {
+      background: var(--green-dim);
+      color: var(--green);
+      border: 1px solid rgba(52,211,153,0.3);
+    }
+    .label-badge.orange {
+      background: var(--orange-dim);
+      color: var(--orange);
+      border: 1px solid rgba(251,146,60,0.3);
+    }
+    .label-card h3 {
+      font-size: 18px;
+      font-weight: 700;
+      margin-bottom: 12px;
+    }
+    .label-card p {
+      font-size: 14px;
+      color: var(--text-secondary);
+      line-height: 1.7;
+      margin-bottom: 8px;
+    }
+    .label-card p:last-child { margin-bottom: 0; }
+    .label-card .code-inline {
+      margin-top: 8px;
+    }
+
+    /* --- BRANCH PROTECTION --- */
+    .protection-list {
+      list-style: none;
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+      max-width: 600px;
+    }
+    .protection-list li {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      font-size: 15px;
+      color: var(--text-secondary);
+      line-height: 1.6;
+    }
+    .protection-list .check {
+      flex-shrink: 0;
+      width: 28px;
+      height: 28px;
+      border-radius: 6px;
+      background: var(--green-dim);
+      color: var(--green);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-family: var(--font-mono);
+      font-size: 14px;
+      font-weight: 700;
+    }
+
+    /* --- FLOW DIAGRAM --- */
+    .flow-diagram {
+      margin-top: 48px;
+    }
+    .flow-row {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 0;
+      flex-wrap: wrap;
+    }
+    .flow-node {
+      background: var(--bg-surface);
+      border: 1px solid var(--border-medium);
+      padding: 14px 20px;
+      border-radius: 8px;
+      font-family: var(--font-mono);
+      font-size: 12px;
+      color: var(--text-secondary);
+      white-space: nowrap;
+      transition: border-color 0.3s, color 0.3s;
+      text-align: center;
+    }
+    .flow-node:hover {
+      border-color: var(--gold);
+      color: var(--text-primary);
+    }
+    .flow-node.highlight {
+      border-color: var(--gold);
+      color: var(--gold);
+      background: var(--gold-dim);
+    }
+    .flow-node.green-hl {
+      border-color: var(--green);
+      color: var(--green);
+      background: var(--green-dim);
+    }
+    .flow-node.orange-hl {
+      border-color: var(--orange);
+      color: var(--orange);
+      background: var(--orange-dim);
+    }
+    .flow-arrow {
+      color: var(--text-tertiary);
+      font-size: 18px;
+      padding: 0 8px;
+      flex-shrink: 0;
+    }
+    .flow-branch {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 16px;
+      margin-top: 24px;
+    }
+    .flow-branch-row {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 12px;
+    }
+    .flow-branch-label {
+      font-family: var(--font-mono);
+      font-size: 11px;
+      color: var(--text-tertiary);
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+    }
+    .flow-vertical-arrow {
+      color: var(--text-tertiary);
+      font-size: 18px;
+      display: block;
+      text-align: center;
+    }
+
+    /* --- WORKFLOWS GRID --- */
+    .workflows-grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 2px;
+    }
+    .workflow-cell {
+      background: var(--bg-surface);
+      padding: 28px 24px;
+      border: 1px solid var(--border-subtle);
+      transition: background 0.3s;
+    }
+    .workflow-cell:nth-child(1) { border-radius: 12px 0 0 0; }
+    .workflow-cell:nth-child(2) { border-radius: 0 12px 0 0; }
+    .workflow-cell:nth-child(3) { border-radius: 0 0 0 12px; }
+    .workflow-cell:nth-child(4) { border-radius: 0 0 12px 0; }
+    .workflow-cell:hover { background: var(--bg-elevated); }
+    .workflow-name {
+      font-family: var(--font-mono);
+      font-size: 13px;
+      color: var(--gold);
+      margin-bottom: 8px;
+      word-break: break-all;
+    }
+    .workflow-cell h4 {
+      font-size: 15px;
+      font-weight: 600;
+      margin-bottom: 8px;
+    }
+    .workflow-cell p {
+      font-size: 13px;
+      color: var(--text-secondary);
+      line-height: 1.6;
+    }
+
+    /* --- FOOTER --- */
+    footer {
+      border-top: 1px solid var(--border-subtle);
+      padding: 48px 0;
+    }
+    footer .container {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    .footer-left {
+      font-size: 13px;
+      color: var(--text-tertiary);
+    }
+    .footer-left strong {
+      color: var(--text-secondary);
+      font-weight: 500;
+    }
+    .footer-links {
+      display: flex;
+      gap: 24px;
+    }
+    .footer-links a {
+      font-size: 13px;
+      color: var(--text-tertiary);
+    }
+    .footer-links a:hover { color: var(--text-primary); }
+
+    /* --- ANIMATIONS --- */
+    @keyframes fadeUp {
+      from { opacity: 0; transform: translateY(24px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+    .animate-in {
+      opacity: 0;
+      animation: fadeUp 0.6s ease-out forwards;
+    }
+    .delay-1 { animation-delay: 0.1s; }
+    .delay-2 { animation-delay: 0.2s; }
+    .delay-3 { animation-delay: 0.3s; }
+
+    /* --- RESPONSIVE --- */
+    @media (max-width: 900px) {
+      .cards-grid { grid-template-columns: 1fr; }
+      .rules-grid { grid-template-columns: repeat(2, 1fr); }
+      .rule-cell,
+      .rule-cell:nth-child(1),
+      .rule-cell:nth-child(3),
+      .rule-cell:nth-child(7),
+      .rule-cell:nth-child(9) { border-radius: 0; }
+      .workflows-grid { grid-template-columns: 1fr; }
+      .workflow-cell,
+      .workflow-cell:nth-child(1),
+      .workflow-cell:nth-child(2),
+      .workflow-cell:nth-child(3),
+      .workflow-cell:nth-child(4) { border-radius: 0; }
+      .flow-row { gap: 8px; }
+      .flow-arrow { display: none; }
+      .flow-node { font-size: 11px; padding: 10px 14px; }
+    }
+    @media (max-width: 600px) {
+      .rules-grid { grid-template-columns: 1fr; }
+      .nav-links { display: none; }
+      footer .container { flex-direction: column; gap: 16px; text-align: center; }
+      .flow-row { flex-direction: column; gap: 8px; }
+      .flow-branch-row { flex-direction: column; gap: 8px; }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- NAV -->
+  <nav>
+    <div class="container">
+      <div class="nav-brand"><span>geniova</span>/developer-kit</div>
+      <div class="nav-links">
+        <a href="index.html">Inicio</a>
+        <a href="onboarding.html">Onboarding</a>
+        <a href="pr-workflow.html" class="active">PR Workflow</a>
+        <a href="reference.html">Referencia</a>
+      </div>
+    </div>
+  </nav>
+
+  <!-- HERO -->
+  <section class="hero">
+    <div class="hero-content">
+      <div class="hero-label animate-in">Geniova Developer Kit</div>
+      <h1 class="animate-in delay-1">Flujo de Pull Requests</h1>
+      <p class="animate-in delay-2">Branch protection, code review automatizado con BecarIA, automerge y override de emergencia. Todo el ciclo de vida de una PR documentado.</p>
+    </div>
+  </section>
+
+  <div class="divider"></div>
+
+  <!-- REGLA FUNDAMENTAL -->
+  <section id="regla">
+    <div class="container">
+      <div class="section-label">Regla fundamental</div>
+      <h2 class="section-title">Nunca push directo a main</h2>
+      <p class="section-subtitle">Todo cambio entra al repositorio mediante Pull Request. Sin excepciones. La rama main esta protegida en todos los repositorios de la organizacion.</p>
+
+      <div class="rule-callout">
+        <h3>Prohibido</h3>
+        <p>No se permite <code style="font-family:var(--font-mono);color:var(--red)">git push origin main</code> ni <code style="font-family:var(--font-mono);color:var(--red)">git push --force</code> a main. Branch protection rechazara el push. Cualquier cambio, por pequeno que sea, debe pasar por una PR revisada y aprobada.</p>
+      </div>
+    </div>
+  </section>
+
+  <div class="divider"></div>
+
+  <!-- CREAR UNA PR -->
+  <section id="crear-pr">
+    <div class="container">
+      <div class="section-label">Paso a paso</div>
+      <h2 class="section-title">Crear una PR</h2>
+      <p class="section-subtitle">Desde la creacion de la rama hasta la apertura de la Pull Request. Commits pequenos, convenciones claras.</p>
+
+      <div class="steps-list">
+        <div class="qs-step">
+          <div class="qs-number">1</div>
+          <div class="qs-content">
+            <h3>Crear rama desde main</h3>
+            <p>Usa el formato estandar con el ID de la card del Planning Game y una descripcion corta.</p>
+            <div class="code-inline">git checkout -b feat/PRJ-TSK-XXXX-descripcion-corta</div>
+            <p style="margin-top:8px">Para bugs: <code style="font-family:var(--font-mono);font-size:13px;color:var(--blue)">fix/PRJ-BUG-XXXX-descripcion-corta</code></p>
+          </div>
+        </div>
+
+        <div class="qs-step">
+          <div class="qs-number">2</div>
+          <div class="qs-content">
+            <h3>Commits con Conventional Commits</h3>
+            <p>Cada commit debe seguir el formato estandar. El hook de commit valida el formato automaticamente.</p>
+            <div class="code-inline">feat: add employee vacation calendar</div>
+            <p style="margin-top:8px">Prefijos validos: <code style="font-family:var(--font-mono);font-size:12px;color:var(--text-secondary)">feat: fix: refactor: chore: test: docs:</code></p>
+          </div>
+        </div>
+
+        <div class="qs-step">
+          <div class="qs-number">3</div>
+          <div class="qs-content">
+            <h3>Mantener las PRs pequenas</h3>
+            <p>Maximo ~300 lineas cambiadas por PR, idealmente menos de 200. PRs atomicas: un solo proposito por PR. Separar infraestructura y refactors de cambios funcionales.</p>
+          </div>
+        </div>
+
+        <div class="qs-step">
+          <div class="qs-number">4</div>
+          <div class="qs-content">
+            <h3>Push y crear la PR</h3>
+            <p>Sube la rama y crea la Pull Request con el CLI de GitHub.</p>
+            <div class="code-inline">gh pr create --title "feat: descripcion" --body "..."</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <div class="divider"></div>
+
+  <!-- REVIEW POR BECARIA -->
+  <section id="review">
+    <div class="container">
+      <div class="section-label">Code Review automatizado</div>
+      <h2 class="section-title">Review por BecarIA</h2>
+      <p class="section-subtitle">BecarIA es la GitHub App de Geniova que publica reviews automaticas en Pull Requests. Analiza el diff contra las review-rules definidas.</p>
+
+      <div class="cards-grid">
+        <div class="info-card">
+          <h3>Flujo con Karajan</h3>
+          <p>El flujo recomendado. El desarrollador ejecuta la review en local y BecarIA la publica en GitHub.</p>
+          <ul class="flow-steps">
+            <li>Desarrollador ejecuta <code style="font-family:var(--font-mono);color:var(--green)">kj review</code> en local (con su propia API key)</li>
+            <li>Karajan analiza el diff de la PR contra las review-rules</li>
+            <li>Si <code style="font-family:var(--font-mono);color:var(--blue)">becaria.enabled: true</code> en kj.config.yml, envia repository_dispatch a GitHub</li>
+            <li>El workflow becaria-gateway.yml genera token de la App y publica la review</li>
+            <li>La review aparece como APPROVE o REQUEST_CHANGES de <code style="font-family:var(--font-mono);color:var(--gold)">becaria-reviewer[bot]</code></li>
+          </ul>
+        </div>
+
+        <div class="info-card">
+          <h3>Flujo sin Karajan</h3>
+          <p>Alternativa cuando Karajan no esta disponible o configurado.</p>
+          <ul class="flow-steps">
+            <li>Review manual por un companero del equipo</li>
+            <li>Al menos 1 aprobacion requerida para poder mergear</li>
+          </ul>
+          <p style="margin-top:16px">Ambos flujos son validos. Karajan automatiza el proceso pero no es obligatorio para todas las PRs.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <div class="divider"></div>
+
+  <!-- REVIEW RULES -->
+  <section id="rules">
+    <div class="container">
+      <div class="section-label">Criterios de evaluacion</div>
+      <h2 class="section-title">Review Rules</h2>
+      <p class="section-subtitle">Las reglas que BecarIA evalua en cada Pull Request. Si alguna falla, la review sera REQUEST_CHANGES.</p>
+
+      <div class="rules-grid">
+        <div class="rule-cell">
+          <div class="rule-icon gold">CC</div>
+          <h4>Conventional Commits</h4>
+          <p>Todos los commits siguen el formato feat:, fix:, refactor:, etc.</p>
+        </div>
+        <div class="rule-cell">
+          <div class="rule-icon blue">SK</div>
+          <h4>Sin secrets</h4>
+          <p>No API keys, credenciales, tokens ni secretos en el codigo.</p>
+        </div>
+        <div class="rule-cell">
+          <div class="rule-icon green">AI</div>
+          <h4>Sin refs a IA</h4>
+          <p>No referencias a Claude, Copilot u otras IA en commits o codigo.</p>
+        </div>
+        <div class="rule-cell">
+          <div class="rule-icon gold">TS</div>
+          <h4>Tests</h4>
+          <p>Funcionalidad nueva debe incluir tests. Coverage minimo segun tipo.</p>
+        </div>
+        <div class="rule-cell">
+          <div class="rule-icon blue">XS</div>
+          <h4>Seguridad</h4>
+          <p>Sin XSS, SQL injection, command injection ni path traversal.</p>
+        </div>
+        <div class="rule-cell">
+          <div class="rule-icon green">CL</div>
+          <h4>Sin console.log</h4>
+          <p>No console.log en codigo de produccion. Usar logger apropiado.</p>
+        </div>
+        <div class="rule-cell">
+          <div class="rule-icon gold">CS</div>
+          <h4>Const por defecto</h4>
+          <p>Usar const siempre. let solo cuando la reasignacion sea necesaria.</p>
+        </div>
+        <div class="rule-cell">
+          <div class="rule-icon blue">NM</div>
+          <h4>Naming descriptivo</h4>
+          <p>Variables y funciones en ingles con nombres claros y descriptivos.</p>
+        </div>
+        <div class="rule-cell">
+          <div class="rule-icon green">UX</div>
+          <h4>UI/UX</h4>
+          <p>No alert/confirm/prompt nativos. Loading states. Mobile-first.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <div class="divider"></div>
+
+  <!-- LABELS ESPECIALES -->
+  <section id="labels">
+    <div class="container">
+      <div class="section-label">Automatizacion</div>
+      <h2 class="section-title">Labels especiales</h2>
+      <p class="section-subtitle">Dos labels que activan flujos automaticos en las Pull Requests. Usar con conocimiento de causa.</p>
+
+      <div class="cards-grid">
+        <div class="label-card automerge">
+          <div class="label-badge green">automerge</div>
+          <h3>Merge automatico</h3>
+          <p>Se anade a PRs que quieres mergear automaticamente tras la aprobacion. Ideal para PRs de bajo riesgo que ya han sido revisadas.</p>
+          <p><strong style="color:var(--text-primary)">Requisitos:</strong> aprobacion de BecarIA + todos los checks CI en verde. El workflow verifica ambas condiciones antes de ejecutar el merge por squash.</p>
+        </div>
+
+        <div class="label-card houston">
+          <div class="label-badge orange">houston</div>
+          <h3>Override de emergencia</h3>
+          <p>Para situaciones criticas que requieren merge inmediato. Solo puede usarlo el usuario autorizado configurado en <code style="font-family:var(--font-mono);font-size:12px;color:var(--orange)">HOUSTON_AUTHORIZED_USER</code>.</p>
+          <p><strong style="color:var(--text-primary)">Uso:</strong> comentar <code style="font-family:var(--font-mono);font-size:12px;color:var(--orange)">/houston &lt;razon&gt;</code> en la PR. Auto-aprueba y mergea inmediatamente. Deja registro completo: quien, cuando, por que.</p>
+          <p><strong style="color:var(--text-primary)">Reservado para GeniovaIT.</strong> Usar con extrema precaucion.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <div class="divider"></div>
+
+  <!-- BRANCH PROTECTION -->
+  <section id="branch-protection">
+    <div class="container">
+      <div class="section-label">Proteccion</div>
+      <h2 class="section-title">Branch Protection</h2>
+      <p class="section-subtitle">Configuracion aplicada a todos los repositorios de la organizacion Geniova-Technologies.</p>
+
+      <ul class="protection-list">
+        <li>
+          <div class="check">&#10003;</div>
+          Requiere Pull Request para mergear a main
+        </li>
+        <li>
+          <div class="check">&#10003;</div>
+          Minimo 1 aprobacion requerida
+        </li>
+        <li>
+          <div class="check">&#10003;</div>
+          Dismiss stale reviews cuando se hacen nuevos pushes
+        </li>
+        <li>
+          <div class="check">&#10003;</div>
+          No se permite force push a main
+        </li>
+        <li>
+          <div class="check">&#10003;</div>
+          No se permite eliminar la rama main
+        </li>
+      </ul>
+    </div>
+  </section>
+
+  <div class="divider"></div>
+
+  <!-- DIAGRAMA DEL FLUJO -->
+  <section id="diagrama">
+    <div class="container">
+      <div class="section-label">Vision general</div>
+      <h2 class="section-title">Diagrama del flujo</h2>
+      <p class="section-subtitle">El recorrido completo de una Pull Request desde el push hasta el merge, incluyendo los flujos alternativos.</p>
+
+      <div class="flow-diagram">
+        <!-- Main flow -->
+        <div class="flow-row">
+          <div class="flow-node highlight">Developer</div>
+          <div class="flow-arrow">&rarr;</div>
+          <div class="flow-node">Push rama</div>
+          <div class="flow-arrow">&rarr;</div>
+          <div class="flow-node">Crear PR</div>
+          <div class="flow-arrow">&rarr;</div>
+          <div class="flow-node">kj review</div>
+          <div class="flow-arrow">&rarr;</div>
+          <div class="flow-node">dispatch</div>
+          <div class="flow-arrow">&rarr;</div>
+          <div class="flow-node">BecarIA gateway</div>
+          <div class="flow-arrow">&rarr;</div>
+          <div class="flow-node highlight">Review en PR</div>
+        </div>
+
+        <!-- Branch outcomes -->
+        <div class="flow-branch">
+          <div class="flow-vertical-arrow">&darr;</div>
+
+          <div class="flow-branch-row">
+            <div>
+              <div class="flow-branch-label" style="margin-bottom:8px;text-align:center">automerge label</div>
+              <div style="display:flex;align-items:center;gap:8px">
+                <div class="flow-node green-hl">Aprobacion + CI verde</div>
+                <div class="flow-arrow">&rarr;</div>
+                <div class="flow-node green-hl">Merge</div>
+              </div>
+            </div>
+
+            <div style="padding:0 32px;color:var(--text-tertiary);font-family:var(--font-mono);font-size:12px">o</div>
+
+            <div>
+              <div class="flow-branch-label" style="margin-bottom:8px;text-align:center">houston label</div>
+              <div style="display:flex;align-items:center;gap:8px">
+                <div class="flow-node orange-hl">/houston &lt;razon&gt;</div>
+                <div class="flow-arrow">&rarr;</div>
+                <div class="flow-node orange-hl">Emergency merge</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <div class="divider"></div>
+
+  <!-- WORKFLOWS -->
+  <section id="workflows">
+    <div class="container">
+      <div class="section-label">GitHub Actions</div>
+      <h2 class="section-title">Workflows</h2>
+      <p class="section-subtitle">Los cuatro workflows de GitHub Actions que automatizan el flujo de PRs en los repositorios de Geniova.</p>
+
+      <div class="workflows-grid">
+        <div class="workflow-cell">
+          <div class="workflow-name">becaria-gateway.yml</div>
+          <h4>BecarIA Gateway</h4>
+          <p>Recibe el evento repository_dispatch de Karajan, genera un token de instalacion de la GitHub App y publica la review como becaria-reviewer[bot].</p>
+        </div>
+        <div class="workflow-cell">
+          <div class="workflow-name">automerge.yml</div>
+          <h4>Automerge</h4>
+          <p>Monitoriza PRs con el label automerge. Cuando detecta aprobacion de BecarIA y todos los checks CI en verde, ejecuta merge por squash automaticamente.</p>
+        </div>
+        <div class="workflow-cell">
+          <div class="workflow-name">houston-override.yml</div>
+          <h4>Houston Override</h4>
+          <p>Override de emergencia. Escucha el comentario /houston en PRs con el label houston. Verifica el usuario autorizado, auto-aprueba y mergea con registro de auditoria.</p>
+        </div>
+        <div class="workflow-cell">
+          <div class="workflow-name">no-ai-refs.yml</div>
+          <h4>No AI References</h4>
+          <p>Bloquea atribucion a IA en PRs, issues y comentarios. Detecta Co-Authored-By de Claude, Copilot, y otras referencias a herramientas de IA.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- FOOTER -->
+  <footer>
+    <div class="container">
+      <div class="footer-left">
+        <strong>Geniova Technologies</strong> &mdash; 2026
+      </div>
+      <div class="footer-links">
+        <a href="index.html">Inicio</a>
+        <a href="https://github.com/Geniova-Technologies/geniova-developer-kit">GitHub</a>
+        <a href="https://geniova.com">geniova.com</a>
+      </div>
+    </div>
+  </footer>
+
+  <!-- Scroll animations -->
+  <script>
+    const observer = new IntersectionObserver((entries) => {
+      entries.forEach(entry => {
+        if (entry.isIntersecting) {
+          entry.target.style.opacity = '1';
+          entry.target.style.transform = 'translateY(0)';
+        }
+      });
+    }, { threshold: 0.1, rootMargin: '0px 0px -40px 0px' });
+
+    document.querySelectorAll('.info-card, .rule-cell, .label-card, .qs-step, .workflow-cell, .protection-list li, .flow-node').forEach((el, i) => {
+      el.style.opacity = '0';
+      el.style.transform = 'translateY(20px)';
+      el.style.transition = 'opacity 0.5s ease ' + (i * 0.04) + 's, transform 0.5s ease ' + (i * 0.04) + 's';
+      observer.observe(el);
+    });
+  </script>
+
+</body>
+</html>
