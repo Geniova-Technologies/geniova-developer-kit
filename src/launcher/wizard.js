@@ -16,6 +16,17 @@ export async function launchWizard() {
       stdio: 'pipe',
       encoding: 'utf-8',
     });
+
+    const ghToken = execSync('gh auth token', {
+      stdio: 'pipe',
+      encoding: 'utf-8',
+    }).trim();
+
+    execSync(`npm config set //npm.pkg.github.com/:_authToken ${ghToken}`, {
+      stdio: 'pipe',
+      encoding: 'utf-8',
+    });
+
     success('Registry configurado');
   } catch {
     error('No se pudo configurar el registry de GitHub Packages');
