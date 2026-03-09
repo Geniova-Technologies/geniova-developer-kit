@@ -3,6 +3,11 @@ import { success, error, info } from '../utils/logger.js';
 
 const TOOLS = [
   {
+    name: 'git',
+    command: 'git --version',
+    installHint: 'Instala Git: https://git-scm.com/downloads (Linux: sudo apt install git | macOS: xcode-select --install)',
+  },
+  {
     name: 'node',
     command: 'node --version',
     minVersion: '18',

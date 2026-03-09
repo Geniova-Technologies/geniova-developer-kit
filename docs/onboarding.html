@@ -205,8 +205,7 @@
     }
     .prereq-card:first-child { border-radius: 12px 0 0 0; }
     .prereq-card:nth-child(3) { border-radius: 0 12px 0 0; }
-    .prereq-card:nth-child(4) { border-radius: 0 0 0 12px; }
-    .prereq-card:last-child { border-radius: 0 0 12px 0; }
+    .prereq-card:last-child { border-radius: 0 0 12px 12px; }
     .prereq-card:hover {
       border-color: var(--border-medium);
       background: var(--bg-elevated);
@@ -569,6 +568,12 @@
 
       <div class="prereq-grid">
         <div class="prereq-card">
+          <div class="prereq-icon gold">gt</div>
+          <h3>Git</h3>
+          <div class="prereq-detail">git --version</div>
+          <p>Control de versiones. <a href="https://git-scm.com/downloads">git-scm.com</a>. En Linux: <code style="font-family:var(--font-mono);font-size:12px;color:var(--green)">sudo apt install git</code>. En macOS: <code style="font-family:var(--font-mono);font-size:12px;color:var(--green)">xcode-select --install</code>.</p>
+        </div>
+        <div class="prereq-card">
           <div class="prereq-icon green">Nd</div>
           <h3>Node.js</h3>
           <div class="prereq-detail">>= 18</div>
@@ -635,6 +640,7 @@
               <div class="terminal-body">
                 <div><span class="prompt">$</span> <span class="cmd">npx</span> <span class="flag">@geniova/developer-kit</span> <span class="cmd">init</span></div>
                 <div><span class="output">&nbsp;</span></div>
+                <div><span class="success">&#10003;</span> <span class="output">git 2.43.0</span></div>
                 <div><span class="success">&#10003;</span> <span class="output">Node.js v22.14.0</span></div>
                 <div><span class="success">&#10003;</span> <span class="output">pnpm 10.6.2</span></div>
                 <div><span class="success">&#10003;</span> <span class="output">gh authenticated</span></div>
