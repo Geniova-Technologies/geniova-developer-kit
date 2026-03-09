@@ -1,6 +1,6 @@
 {
   "name": "@geniova/developer-kit",
-  "version": "0.1.0",
+  "version": "1.0.0",
   "description": "Bootstrapper para el entorno de desarrollo Geniova Technologies",
   "type": "module",
   "bin": {

@@ -24,7 +24,7 @@ export function info(msg) {
 
 export function banner() {
   console.log();
-  console.log(`  ${BOLD}${CYAN}Geniova Developer Kit${RESET} ${DIM}v0.1.0${RESET}`);
+  console.log(`  ${BOLD}${CYAN}Geniova Developer Kit${RESET} ${DIM}v1.0.0${RESET}`);
   console.log(`  ${DIM}Bootstrapper para el entorno de desarrollo${RESET}`);
   console.log();
 }
