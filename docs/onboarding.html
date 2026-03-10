@@ -576,8 +576,8 @@
         <div class="prereq-card">
           <div class="prereq-icon green">Nd</div>
           <h3>Node.js</h3>
-          <div class="prereq-detail">>= 18</div>
-          <p>Instalar desde <a href="https://nodejs.org/">nodejs.org</a> o usando <a href="https://github.com/nvm-sh/nvm">nvm</a> para gestionar multiples versiones.</p>
+          <div class="prereq-detail">>= 18 (via nvm)</div>
+          <p>Instalar con <a href="https://github.com/nvm-sh/nvm">nvm</a> para que todos los entornos sean consistentes: <code style="font-family:var(--font-mono);font-size:12px;color:var(--green)">curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.40.3/install.sh | bash</code> y luego <code style="font-family:var(--font-mono);font-size:12px;color:var(--green)">nvm install 22</code>.</p>
         </div>
         <div class="prereq-card">
           <div class="prereq-icon gold">pm</div>
@@ -657,10 +657,10 @@
           <div class="step-number">2</div>
           <div class="step-body">
             <h3>Configurar MCPs</h3>
-            <p>Los MCPs (Model Context Protocol Servers) conectan las herramientas de IA con los servicios de Geniova. Se instalan en la configuracion global de Claude Code.</p>
+            <p>Los MCPs (Model Context Protocol Servers) conectan las herramientas de IA con los servicios de Geniova. El wizard los instala automaticamente en la configuracion global de Claude Code. No necesitas hacer nada, solo confirmar.</p>
 
             <div class="mcp-group">
-              <div class="mcp-group-title">Obligatorios (automaticos)</div>
+              <div class="mcp-group-title">Todos obligatorios (instalados automaticamente por el wizard)</div>
               <div class="mcp-tags">
                 <div class="mcp-tag required">
                   <span class="mcp-tag-name">Planning Game</span>
@@ -670,22 +670,18 @@
                   <span class="mcp-tag-name">Karajan</span>
                   <span class="mcp-tag-desc">Orquestacion de agentes y code review</span>
                 </div>
-              </div>
-            </div>
-
-            <div class="mcp-group">
-              <div class="mcp-group-title">Opcionales (propuestos al usuario)</div>
-              <div class="mcp-tags">
-                <div class="mcp-tag optional">
+                <div class="mcp-tag required">
                   <span class="mcp-tag-name">Chrome DevTools</span>
                   <span class="mcp-tag-desc">Verificacion visual, screenshots, debugging</span>
                 </div>
-                <div class="mcp-tag optional">
+                <div class="mcp-tag required">
                   <span class="mcp-tag-name">SonarQube</span>
                   <span class="mcp-tag-desc">Analisis de calidad de codigo</span>
                 </div>
               </div>
             </div>
+
+            <p style="font-size:13px;color:var(--text-secondary);margin-top:12px"><strong style="color:var(--text-primary)">SonarQube</strong> requiere Docker en tu maquina. El wizard instala el MCP automaticamente; el servidor SonarQube se arranca con <code style="font-family:var(--font-mono);font-size:12px;color:var(--green)">docker compose -f ~/sonarqube/docker-compose.yml up -d</code>. Si no tienes Docker, el MCP se instala igualmente y podras configurar SonarQube mas adelante.</p>
           </div>
         </div>
 
@@ -694,11 +690,11 @@
           <div class="step-number">3</div>
           <div class="step-body">
             <h3>Configurar Karajan y BecarIA</h3>
-            <p>El wizard configura Karajan para orquestar agentes de IA y activa BecarIA como reviewer automatico en las Pull Requests de todos los proyectos.</p>
+            <p>El wizard genera automaticamente la configuracion de Karajan y activa BecarIA como reviewer en las Pull Requests. No necesitas editar ningun fichero manualmente.</p>
             <ul class="step-detail-list">
-              <li>Genera <span class="mono">~/.karajan/kj.config.yml</span> con la configuracion global</li>
-              <li>Activa BecarIA para review automatico via GitHub App</li>
-              <li>Claude es obligatorio (licencia Geniova), Codex y Gemini son opcionales (cuentas personales gratuitas)</li>
+              <li>El wizard genera <span class="mono">~/.karajan/kj.config.yml</span> automaticamente</li>
+              <li>BecarIA queda activo como reviewer automatico via GitHub App en todos los repos de la org</li>
+              <li>Claude es obligatorio (licencia proporcionada por Geniova). Codex y Gemini son opcionales: puedes crear cuentas personales gratuitas para usarlos como agentes adicionales en Karajan</li>
             </ul>
           </div>
         </div>
