@@ -553,7 +553,7 @@
     <div class="page-header-content">
       <div class="hero-label animate-in">Paso a paso</div>
       <h1 class="animate-in delay-1">Guia de Onboarding</h1>
-      <p class="animate-in delay-2">Todo lo que necesitas para configurar tu entorno de desarrollo en Geniova Technologies, desde los prerrequisitos hasta tu primer <code style="font-family:var(--font-mono);color:var(--green);font-size:inherit">pnpm dev</code>.</p>
+      <p class="animate-in delay-2">Todo lo que necesitas para preparar tu entorno de desarrollo en Geniova Technologies. Herramientas, autenticacion, MCPs y configuracion global.</p>
     </div>
   </header>
 
@@ -620,7 +620,7 @@
     <div class="container">
       <div class="section-label">Configuracion</div>
       <h2 class="section-title">Pasos de instalacion</h2>
-      <p class="section-subtitle">Un unico comando inicia todo el proceso. Cada paso se ejecuta de forma secuencial y verifica el resultado antes de continuar.</p>
+      <p class="section-subtitle">Un unico comando inicia todo el proceso. El kit prepara tu entorno de desarrollo global, no un proyecto especifico.</p>
 
       <div class="steps-list">
 
@@ -629,7 +629,7 @@
           <div class="step-number">1</div>
           <div class="step-body">
             <h3>Ejecutar el bootstrapper</h3>
-            <p>El punto de entrada publico verifica que tu maquina cumple todos los prerrequisitos, valida la autenticacion con GitHub y Firebase, y confirma la pertenencia a la organizacion Geniova-Technologies.</p>
+            <p>El punto de entrada publico verifica que tu maquina cumple todos los prerrequisitos (7 herramientas), valida la autenticacion con GitHub y Firebase, confirma la pertenencia a la organizacion Geniova-Technologies, y verifica el scope <code style="font-family:var(--font-mono);font-size:inherit;color:var(--green)">read:packages</code> para acceder a los paquetes privados. Si falta el scope, lo solicita automaticamente via <code style="font-family:var(--font-mono);font-size:inherit;color:var(--green)">gh auth refresh</code>.</p>
             <div class="terminal">
               <div class="terminal-bar">
                 <div class="terminal-dot"></div>
@@ -643,8 +643,9 @@
                 <div><span class="success">&#10003;</span> <span class="output">git 2.43.0</span></div>
                 <div><span class="success">&#10003;</span> <span class="output">Node.js v22.14.0</span></div>
                 <div><span class="success">&#10003;</span> <span class="output">pnpm 10.6.2</span></div>
-                <div><span class="success">&#10003;</span> <span class="output">gh authenticated</span></div>
+                <div><span class="success">&#10003;</span> <span class="output">gh authenticated + read:packages</span></div>
                 <div><span class="success">&#10003;</span> <span class="output">firebase authenticated</span></div>
+                <div><span class="success">&#10003;</span> <span class="output">claude, karajan</span></div>
                 <div><span class="success">&#10003;</span> <span class="output">Miembro de Geniova-Technologies</span></div>
               </div>
             </div>
@@ -655,51 +656,8 @@
         <div class="step-item">
           <div class="step-number">2</div>
           <div class="step-body">
-            <h3>Seleccionar proyecto</h3>
-            <p>El wizard muestra los 19 proyectos disponibles organizados por categoria. Selecciona el proyecto en el que vas a trabajar.</p>
-            <ul class="step-detail-list">
-              <li><strong>Plataforma dental</strong> &mdash; 6 proyectos (Extranet V2, Intranet, Intranet-Extended, Visor-Editor, Cinema4D, Geniova Platform)</li>
-              <li><strong>Herramientas internas</strong> &mdash; 10 proyectos (PlanningGame, Planning Game MCP, Portal de Incidencias, Auth&amp;Sign, Inventario, Geniova Space, Geniova Link, Firestore-Myadmin, Web Geniova, Geniova Employee)</li>
-              <li><strong>Gestion y soporte</strong> &mdash; IT, IA, Desarrollos en SAP, Marketing</li>
-            </ul>
-            <div class="terminal">
-              <div class="terminal-bar">
-                <div class="terminal-dot"></div>
-                <div class="terminal-dot"></div>
-                <div class="terminal-dot"></div>
-                <div class="terminal-title">Terminal</div>
-              </div>
-              <div class="terminal-body">
-                <div><span class="output">? Selecciona categoria:</span></div>
-                <div><span class="success">&gt;</span> <span class="cmd">Herramientas internas</span></div>
-                <div><span class="output">&nbsp;</span></div>
-                <div><span class="output">? Selecciona proyecto:</span></div>
-                <div><span class="success">&gt;</span> <span class="cmd">Geniova Employee</span></div>
-              </div>
-            </div>
-          </div>
-        </div>
-
-        <!-- Paso 3 -->
-        <div class="step-item">
-          <div class="step-number">3</div>
-          <div class="step-body">
-            <h3>Clonar e instalar</h3>
-            <p>El wizard clona el repositorio en el directorio estandar y ejecuta la instalacion de dependencias automaticamente.</p>
-            <ul class="step-detail-list">
-              <li>Clona el repo en <span class="mono">~/ws_geniova/{proyecto}</span></li>
-              <li>Ejecuta <span class="mono">pnpm install</span> para instalar todas las dependencias</li>
-              <li>Para proyectos con autenticacion, instala el SDK <span class="mono">@geniova/auth</span> desde el repositorio local</li>
-            </ul>
-          </div>
-        </div>
-
-        <!-- Paso 4 -->
-        <div class="step-item">
-          <div class="step-number">4</div>
-          <div class="step-body">
             <h3>Configurar MCPs</h3>
-            <p>Los MCPs (Model Context Protocol Servers) conectan las herramientas de IA con los servicios del proyecto. Se instalan en la configuracion de Claude Code.</p>
+            <p>Los MCPs (Model Context Protocol Servers) conectan las herramientas de IA con los servicios de Geniova. Se instalan en la configuracion global de Claude Code.</p>
 
             <div class="mcp-group">
               <div class="mcp-group-title">Obligatorios (automaticos)</div>
@@ -731,51 +689,26 @@
           </div>
         </div>
 
-        <!-- Paso 5 -->
+        <!-- Paso 3 -->
         <div class="step-item">
-          <div class="step-number">5</div>
+          <div class="step-number">3</div>
           <div class="step-body">
-            <h3>Git Hooks y Guidelines</h3>
-            <p>Se ejecuta el paquete de hooks que protege el repositorio con checks automaticos e instala guidelines para todos los agentes de IA soportados.</p>
-            <div class="terminal">
-              <div class="terminal-bar">
-                <div class="terminal-dot"></div>
-                <div class="terminal-dot"></div>
-                <div class="terminal-dot"></div>
-                <div class="terminal-title">Terminal</div>
-              </div>
-              <div class="terminal-body">
-                <div><span class="prompt">$</span> <span class="cmd">npx</span> <span class="flag">@geniova/git-hooks</span> <span class="cmd">init</span></div>
-                <div><span class="output">&nbsp;</span></div>
-                <div><span class="success">&#10003;</span> <span class="output">Husky instalado (3 hooks)</span></div>
-                <div><span class="output">&nbsp;&nbsp;</span><span class="output">pre-commit, commit-msg, pre-push</span></div>
-                <div><span class="success">&#10003;</span> <span class="output">Guidelines generados (5 agentes)</span></div>
-                <div><span class="output">&nbsp;&nbsp;</span><span class="output">CLAUDE.md, .cursorrules, copilot, gemini, codex</span></div>
-                <div><span class="success">&#10003;</span> <span class="output">GitHub Action no-ai-refs instalada</span></div>
-              </div>
-            </div>
-          </div>
-        </div>
-
-        <!-- Paso 6 -->
-        <div class="step-item">
-          <div class="step-number">6</div>
-          <div class="step-body">
-            <h3>Configuracion</h3>
-            <p>El wizard genera el fichero <code style="font-family:var(--font-mono);font-size:13px;color:var(--green)">.env</code> con las variables de entorno del proyecto. Revisa los valores y completa los que aparezcan como pendientes.</p>
+            <h3>Configurar Karajan y BecarIA</h3>
+            <p>El wizard configura Karajan para orquestar agentes de IA y activa BecarIA como reviewer automatico en las Pull Requests de todos los proyectos.</p>
             <ul class="step-detail-list">
-              <li>Genera <span class="mono">.env</span> con variables del proyecto (API keys, Firebase config, endpoints)</li>
-              <li>Muestra un resumen con el estado de la configuracion y los proximos pasos recomendados</li>
+              <li>Genera <span class="mono">~/.karajan/kj.config.yml</span> con la configuracion global</li>
+              <li>Activa BecarIA para review automatico via GitHub App</li>
+              <li>Claude es obligatorio (licencia Geniova), Codex y Gemini son opcionales (cuentas personales gratuitas)</li>
             </ul>
           </div>
         </div>
 
-        <!-- Paso 7 -->
+        <!-- Paso 4 -->
         <div class="step-item">
-          <div class="step-number">7</div>
+          <div class="step-number">4</div>
           <div class="step-body">
-            <h3>Verificar</h3>
-            <p>Comprueba que todo funciona correctamente ejecutando el servidor de desarrollo, los tests y el linter.</p>
+            <h3>Entorno listo</h3>
+            <p>Tu entorno de desarrollo esta preparado. Ya puedes clonar cualquier proyecto de Geniova y empezar a trabajar. Al entrar en un repo, ejecuta <code style="font-family:var(--font-mono);font-size:inherit;color:var(--green)">npx @geniova/git-hooks init</code> para instalar los hooks y guidelines del proyecto.</p>
             <div class="terminal">
               <div class="terminal-bar">
                 <div class="terminal-dot"></div>
@@ -784,10 +717,14 @@
                 <div class="terminal-title">Terminal</div>
               </div>
               <div class="terminal-body">
-                <div><span class="prompt">$</span> <span class="cmd">cd</span> <span class="flag">~/ws_geniova/{proyecto}</span></div>
-                <div><span class="prompt">$</span> <span class="cmd">pnpm</span> <span class="flag">dev</span> <span class="output">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;# Servidor de desarrollo</span></div>
-                <div><span class="prompt">$</span> <span class="cmd">pnpm</span> <span class="flag">test</span> <span class="output">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;# Tests</span></div>
-                <div><span class="prompt">$</span> <span class="cmd">pnpm</span> <span class="flag">lint</span> <span class="output">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;# Linting</span></div>
+                <div><span class="prompt">$</span> <span class="cmd">gh</span> <span class="flag">repo clone</span> <span class="cmd">Geniova-Technologies/{proyecto}</span></div>
+                <div><span class="prompt">$</span> <span class="cmd">cd</span> <span class="flag">{proyecto}</span></div>
+                <div><span class="prompt">$</span> <span class="cmd">pnpm</span> <span class="flag">install</span></div>
+                <div><span class="prompt">$</span> <span class="cmd">npx</span> <span class="flag">@geniova/git-hooks</span> <span class="cmd">init</span></div>
+                <div><span class="output">&nbsp;</span></div>
+                <div><span class="success">&#10003;</span> <span class="output">Husky instalado (3 hooks)</span></div>
+                <div><span class="success">&#10003;</span> <span class="output">Guidelines generados (5 agentes)</span></div>
+                <div><span class="success">&#10003;</span> <span class="output">GitHub Action no-ai-refs instalada</span></div>
               </div>
             </div>
           </div>
@@ -804,7 +741,7 @@
     <div class="container">
       <div class="section-label">Dia a dia</div>
       <h2 class="section-title">Flujo de trabajo diario</h2>
-      <p class="section-subtitle">Una vez configurado el entorno, este es el flujo que seguiras para cada tarea o bug. Todas las tareas pasan por Planning Game y Pull Request.</p>
+      <p class="section-subtitle">Con el entorno preparado, este es el flujo que seguiras para cada tarea o bug en cualquier proyecto. Todas las tareas pasan por Planning Game y Pull Request.</p>
 
       <div class="workflow-pipeline">
         <div class="workflow-step">
