@@ -608,13 +608,12 @@
         <div class="terminal-body">
           <div><span class="prompt">$</span> <span class="cmd">npx</span> <span class="flag">@geniova/developer-kit</span> <span class="cmd">init</span></div>
           <div><span class="output">&nbsp;</span></div>
-          <div><span class="success">&#10003;</span> <span class="output">Prerrequisitos verificados</span></div>
-          <div><span class="success">&#10003;</span> <span class="output">Autenticacion correcta</span></div>
-          <div><span class="success">&#10003;</span> <span class="output">Proyecto clonado</span></div>
-          <div><span class="success">&#10003;</span> <span class="output">MCPs configurados</span></div>
-          <div><span class="success">&#10003;</span> <span class="output">Hooks y guidelines instalados</span></div>
+          <div><span class="success">&#10003;</span> <span class="output">7 herramientas verificadas</span></div>
+          <div><span class="success">&#10003;</span> <span class="output">GitHub + Firebase autenticados</span></div>
+          <div><span class="success">&#10003;</span> <span class="output">4 MCPs instalados</span></div>
+          <div><span class="success">&#10003;</span> <span class="output">Karajan y BecarIA configurados</span></div>
           <div><span class="output">&nbsp;</span></div>
-          <div><span class="success">Configuracion completada!</span> <span class="terminal-cursor"></span></div>
+          <div><span class="success">Entorno listo!</span> <span class="terminal-cursor"></span></div>
         </div>
       </div>
     </div>
@@ -649,12 +648,12 @@
           <div class="pkg-number">02</div>
           <div class="pkg-name">@geniova-technologies/geniova-kit</div>
           <h3>Wizard</h3>
-          <p class="pkg-desc">Setup interactivo del proyecto. Selecciona, clona, instala y configura todo el entorno de desarrollo.</p>
+          <p class="pkg-desc">Configuracion automatica del entorno global. Instala MCPs, configura Karajan y deja todo listo para trabajar.</p>
           <ul class="pkg-features">
-            <li>Catalogo de 18 proyectos</li>
-            <li>Clonar repo + dependencias</li>
-            <li>MCPs obligatorios y opcionales</li>
-            <li>Generar .env y configuracion</li>
+            <li>4 MCPs obligatorios</li>
+            <li>Karajan + BecarIA configurados</li>
+            <li>Configuracion global de Claude Code</li>
+            <li>Todo automatico, sin intervencion</li>
             <li>Paquete privado (GitHub Packages)</li>
           </ul>
         </div>
@@ -695,27 +694,15 @@
           <div class="step-arrow">&rarr;</div>
         </div>
         <div class="pipeline-step">
-          <div class="step-node">Proyecto</div>
-          <div class="step-arrow">&rarr;</div>
-        </div>
-        <div class="pipeline-step">
-          <div class="step-node">Clone</div>
-          <div class="step-arrow">&rarr;</div>
-        </div>
-        <div class="pipeline-step">
-          <div class="step-node">Deps</div>
-          <div class="step-arrow">&rarr;</div>
-        </div>
-        <div class="pipeline-step">
           <div class="step-node">MCPs</div>
           <div class="step-arrow">&rarr;</div>
         </div>
         <div class="pipeline-step">
-          <div class="step-node">Hooks</div>
+          <div class="step-node">Karajan</div>
           <div class="step-arrow">&rarr;</div>
         </div>
         <div class="pipeline-step">
-          <div class="step-node">Guidelines</div>
+          <div class="step-node">BecarIA</div>
           <div class="step-arrow">&rarr;</div>
         </div>
         <div class="pipeline-step">
@@ -768,7 +755,7 @@
         <div class="feature-cell">
           <div class="feature-icon gold">SQ</div>
           <h3>SonarQube</h3>
-          <p>Analisis de calidad integrado. Quality gates, coverage, code smells. Opcional pero recomendado.</p>
+          <p>Analisis de calidad integrado. Quality gates, coverage, code smells. Requiere Docker para el servidor local.</p>
         </div>
         <div class="feature-cell">
           <div class="feature-icon blue">18</div>
@@ -786,14 +773,14 @@
     <div class="container">
       <div class="section-label">Empezar</div>
       <h2 class="section-title">Quick Start</h2>
-      <p class="section-subtitle">Tres pasos para tener tu entorno listo. Necesitas pertenecer a la organizacion Geniova-Technologies en GitHub.</p>
+      <p class="section-subtitle">Dos pasos para tener tu entorno listo. Necesitas pertenecer a la organizacion Geniova-Technologies en GitHub.</p>
 
       <div class="steps-list">
         <div class="qs-step">
           <div class="qs-number">1</div>
           <div class="qs-content">
             <h3>Ejecuta el bootstrapper</h3>
-            <p>Verifica prerrequisitos, autenticacion y lanza el wizard automaticamente.</p>
+            <p>Verifica 7 herramientas, autenticacion, instala MCPs y configura Karajan. Todo automatico.</p>
             <div class="code-inline">npx @geniova/developer-kit init</div>
           </div>
         </div>
@@ -801,18 +788,9 @@
         <div class="qs-step">
           <div class="qs-number">2</div>
           <div class="qs-content">
-            <h3>Selecciona tu proyecto</h3>
-            <p>El wizard muestra el catalogo de proyectos. Elige el tuyo y se clona, instala deps, configura MCPs y hooks.</p>
-            <div class="code-inline">? Selecciona proyecto: Extranet V2</div>
-          </div>
-        </div>
-
-        <div class="qs-step">
-          <div class="qs-number">3</div>
-          <div class="qs-content">
-            <h3>Empieza a trabajar</h3>
-            <p>Revisa el .env generado, completa los valores pendientes y comienza a desarrollar con todo configurado.</p>
-            <div class="code-inline">cd extranet-v2 && pnpm dev</div>
+            <h3>Clona un proyecto y empieza a trabajar</h3>
+            <p>Tu entorno esta listo. Clona cualquier repo de Geniova, instala dependencias y ejecuta <code style="font-family:var(--font-mono);font-size:12px;color:var(--green)">npx @geniova/git-hooks init</code> para instalar hooks y guidelines del proyecto.</p>
+            <div class="code-inline">gh repo clone Geniova-Technologies/{proyecto}</div>
           </div>
         </div>
       </div>
@@ -838,7 +816,7 @@
         <div class="arch-box private">
           <div class="arch-label">Privado (GitHub Packages)</div>
           <div class="arch-name">@geniova-technologies/geniova-kit</div>
-          <p>Wizard interactivo. Setup completo del proyecto seleccionado.</p>
+          <p>Wizard automatico. Configura MCPs, Karajan y BecarIA.</p>
         </div>
         <div class="arch-arrow">&rarr;</div>
         <div class="arch-box">
