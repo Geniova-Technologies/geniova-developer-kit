@@ -624,9 +624,9 @@
   <!-- PACKAGES -->
   <section id="packages">
     <div class="container">
-      <div class="section-label">Tres paquetes, un ecosistema</div>
+      <div class="section-label">Monorepo &mdash; tres paquetes, un ecosistema</div>
       <h2 class="section-title">Arquitectura modular</h2>
-      <p class="section-subtitle">Cada pieza tiene una responsabilidad clara. El bootstrapper verifica, el wizard configura, los hooks protegen.</p>
+      <p class="section-subtitle">Los tres paquetes viven en un unico monorepo pnpm. El bootstrapper verifica, el wizard configura, los hooks protegen.</p>
 
       <div class="packages-grid">
         <div class="pkg-card">
@@ -789,8 +789,10 @@
           <div class="qs-number">2</div>
           <div class="qs-content">
             <h3>Clona un proyecto y empieza a trabajar</h3>
-            <p>Tu entorno esta listo. Clona cualquier repo de Geniova, instala dependencias y ejecuta <code style="font-family:var(--font-mono);font-size:12px;color:var(--green)">npx @geniova/git-hooks init</code> para instalar hooks y guidelines del proyecto.</p>
-            <div class="code-inline">gh repo clone Geniova-Technologies/{proyecto}</div>
+            <p>Tu entorno esta listo. Clona cualquier repo de Geniova, instala dependencias e instala los hooks y guidelines del proyecto.</p>
+            <div class="code-inline" style="margin-bottom:8px">gh repo clone Geniova-Technologies/{proyecto}</div>
+            <div class="code-inline" style="margin-bottom:8px">pnpm install</div>
+            <div class="code-inline">npx @geniova/git-hooks init</div>
           </div>
         </div>
       </div>
@@ -804,7 +806,7 @@
     <div class="container">
       <div class="section-label">Diseno</div>
       <h2 class="section-title">Arquitectura</h2>
-      <p class="section-subtitle">El bootstrapper publico es la puerta de entrada. El wizard privado hace el trabajo. Los hooks protegen el resultado.</p>
+      <p class="section-subtitle">Un monorepo pnpm con tres paquetes. El bootstrapper publico es la puerta de entrada. El wizard privado hace el trabajo. Los hooks protegen el resultado.</p>
 
       <div class="arch-diagram">
         <div class="arch-box public">
@@ -819,8 +821,8 @@
           <p>Wizard automatico. Configura MCPs, Karajan y BecarIA.</p>
         </div>
         <div class="arch-arrow">&rarr;</div>
-        <div class="arch-box">
-          <div class="arch-label">Privado (GitHub)</div>
+        <div class="arch-box public">
+          <div class="arch-label">Publico (npm)</div>
           <div class="arch-name">@geniova/git-hooks</div>
           <p>Hooks, checks, guidelines para todos los agentes IA. MCP Server.</p>
         </div>
