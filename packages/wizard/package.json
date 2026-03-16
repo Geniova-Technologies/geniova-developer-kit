@@ -1,0 +1,30 @@
+{
+  "name": "@geniova-technologies/geniova-kit",
+  "version": "0.1.1",
+  "description": "Wizard de configuracion del entorno de desarrollo Geniova Technologies",
+  "main": "src/index.js",
+  "bin": {
+    "geniova-kit-wizard": "./bin/cli.js"
+  },
+  "type": "module",
+  "engines": {
+    "node": ">=18"
+  },
+  "license": "UNLICENSED",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/Geniova-Technologies/geniova-developer-kit",
+    "directory": "packages/wizard"
+  },
+  "publishConfig": {
+    "registry": "https://npm.pkg.github.com"
+  },
+  "files": [
+    "bin/",
+    "src/",
+    "templates/"
+  ],
+  "scripts": {
+    "start": "node bin/cli.js"
+  }
+}

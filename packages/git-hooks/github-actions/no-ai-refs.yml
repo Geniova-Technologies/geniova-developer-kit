@@ -1,0 +1,78 @@
+name: Block AI attribution
+
+on:
+  pull_request:
+    types: [opened, edited]
+  issue_comment:
+    types: [created, edited]
+  pull_request_review:
+    types: [submitted, edited]
+  pull_request_review_comment:
+    types: [created, edited]
+  issues:
+    types: [opened, edited]
+
+jobs:
+  check-ai-refs:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check for AI attribution
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const patterns = [
+              /Co-[Aa]uthored-[Bb]y:.*\b(Claude|Anthropic|OpenAI|ChatGPT|GPT-\d|Copilot|Gemini|BecarIA|Cursor|Windsurf|Codeium|DeepSeek|Bard)\b/i,
+              /Signed-off-by:.*\b(Claude|Anthropic|OpenAI|ChatGPT|Copilot|Gemini|BecarIA|Cursor|Windsurf|Codeium|DeepSeek)\b/i,
+              /(Generated|Created|Written|Made|Built|Authored|Assisted|Powered|Produced|Suggested|Proposed|Drafted|Crafted|Designed)\s+(by|with|using|via)\s+.*(Claude|Anthropic|OpenAI|ChatGPT|GPT-\d|Copilot|Gemini|BecarIA|Cursor|Windsurf|Codeium|DeepSeek|Bard)/i,
+              /\bai[- ]?(generated|assisted|written|created|made|built|authored|powered)\b/i,
+              /\b(made|created|built|written)\s+by\s+ai\b/i,
+            ];
+
+            function check(text, label) {
+              if (!text) return [];
+              const findings = [];
+              for (const line of text.split('\n')) {
+                for (const pattern of patterns) {
+                  if (pattern.test(line)) {
+                    findings.push({ label, line: line.trim(), pattern: pattern.source });
+                    break;
+                  }
+                }
+              }
+              return findings;
+            }
+
+            const findings = [];
+            const event = context.eventName;
+            const payload = context.payload;
+
+            if (event === 'pull_request') {
+              findings.push(...check(payload.pull_request.title, 'PR title'));
+              findings.push(...check(payload.pull_request.body, 'PR body'));
+            }
+
+            if (event === 'issues') {
+              findings.push(...check(payload.issue.title, 'Issue title'));
+              findings.push(...check(payload.issue.body, 'Issue body'));
+            }
+
+            if (event === 'issue_comment') {
+              findings.push(...check(payload.comment.body, 'Comment'));
+            }
+
+            if (event === 'pull_request_review') {
+              findings.push(...check(payload.review.body, 'Review'));
+            }
+
+            if (event === 'pull_request_review_comment') {
+              findings.push(...check(payload.comment.body, 'Review comment'));
+            }
+
+            if (findings.length > 0) {
+              const details = findings.map(f =>
+                `- **${f.label}**: \`${f.line}\``
+              ).join('\n');
+              core.setFailed(
+                `AI attribution detected. Remove these references:\n\n${details}`
+              );
+            }

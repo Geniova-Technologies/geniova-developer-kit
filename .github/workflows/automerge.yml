@@ -1,0 +1,110 @@
+name: Automerge
+
+on:
+  pull_request_review:
+    types: [submitted]
+  check_suite:
+    types: [completed]
+
+permissions:
+  pull-requests: write
+  contents: write
+
+jobs:
+  automerge:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check automerge conditions
+        id: conditions
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          # Determine PR number based on trigger event
+          if [ "${{ github.event_name }}" = "pull_request_review" ]; then
+            PR_NUMBER="${{ github.event.pull_request.number }}"
+          else
+            # For check_suite, find associated PRs
+            PR_NUMBER=$(gh pr list --repo "${{ github.repository }}" \
+              --head "${{ github.event.check_suite.head_branch }}" \
+              --json number --jq '.[0].number' 2>/dev/null || echo "")
+          fi
+
+          if [ -z "$PR_NUMBER" ]; then
+            echo "No PR found for this event"
+            echo "should_merge=false" >> "$GITHUB_OUTPUT"
+            exit 0
+          fi
+
+          echo "pr_number=$PR_NUMBER" >> "$GITHUB_OUTPUT"
+
+          # Check for automerge label
+          HAS_LABEL=$(gh pr view "$PR_NUMBER" --repo "${{ github.repository }}" \
+            --json labels --jq '.labels[].name' | grep -c '^automerge$' || true)
+
+          if [ "$HAS_LABEL" -eq 0 ]; then
+            echo "PR #$PR_NUMBER does not have the automerge label"
+            echo "should_merge=false" >> "$GITHUB_OUTPUT"
+            exit 0
+          fi
+
+          # Check for approved review from BecarIA App
+          APPROVED=$(gh pr reviews "$PR_NUMBER" --repo "${{ github.repository }}" \
+            --json state,author --jq '[.[] | select(.state == "APPROVED" and .author.login == "becaria-reviewer[bot]")] | length')
+
+          if [ "$APPROVED" -eq 0 ]; then
+            echo "PR #$PR_NUMBER not yet approved by BecarIA"
+            echo "should_merge=false" >> "$GITHUB_OUTPUT"
+            exit 0
+          fi
+
+          # Check all CI checks pass
+          CHECKS_STATUS=$(gh pr checks "$PR_NUMBER" --repo "${{ github.repository }}" \
+            --json state --jq '[.[] | select(.state != "SUCCESS" and .state != "SKIPPED")] | length' 2>/dev/null || echo "1")
+
+          if [ "$CHECKS_STATUS" -ne 0 ]; then
+            echo "PR #$PR_NUMBER has failing checks"
+            echo "should_merge=false" >> "$GITHUB_OUTPUT"
+            exit 0
+          fi
+
+          echo "All conditions met for PR #$PR_NUMBER"
+          echo "should_merge=true" >> "$GITHUB_OUTPUT"
+
+      - name: Merge PR
+        if: steps.conditions.outputs.should_merge == 'true'
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          PR_NUMBER: ${{ steps.conditions.outputs.pr_number }}
+          REPO: ${{ github.repository }}
+        run: |
+          gh pr merge "$PR_NUMBER" --repo "$REPO" --merge \
+            || {
+              gh pr comment "$PR_NUMBER" --repo "$REPO" \
+                --body "**Automerge failed.** The PR could not be merged automatically. Please check for merge conflicts or failing checks."
+              exit 1
+            }
+
+          gh pr comment "$PR_NUMBER" --repo "$REPO" \
+            --body "**Automerge completed.** This PR was automatically merged after BecarIA approval and all checks passed."
+
+      - name: Comment on failing checks
+        if: steps.conditions.outputs.should_merge == 'false' && steps.conditions.outputs.pr_number != ''
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          PR_NUMBER: ${{ steps.conditions.outputs.pr_number }}
+          REPO: ${{ github.repository }}
+        run: |
+          # Only comment if the PR has the automerge label but conditions are not met
+          HAS_LABEL=$(gh pr view "$PR_NUMBER" --repo "$REPO" \
+            --json labels --jq '.labels[].name' | grep -c '^automerge$' || true)
+
+          if [ "$HAS_LABEL" -gt 0 ]; then
+            # Check if there's a recent automerge-pending comment to avoid spam
+            RECENT=$(gh pr view "$PR_NUMBER" --repo "$REPO" --json comments \
+              --jq '[.comments[] | select(.body | contains("Automerge pending"))] | length')
+
+            if [ "$RECENT" -eq 0 ]; then
+              gh pr comment "$PR_NUMBER" --repo "$REPO" \
+                --body "**Automerge pending.** Waiting for BecarIA approval and all checks to pass before merging."
+            fi
+          fi
