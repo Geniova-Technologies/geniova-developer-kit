@@ -718,9 +718,9 @@
   <!-- ARCHITECTURE: 3 PACKAGES -->
   <section id="arquitectura">
     <div class="container">
-      <div class="section-label">Tres paquetes, un ecosistema</div>
-      <h2 class="section-title">Arquitectura de 3 paquetes</h2>
-      <p class="section-subtitle">Cada paquete tiene una responsabilidad clara. El bootstrapper verifica, el wizard configura, los hooks protegen.</p>
+      <div class="section-label">Monorepo &mdash; tres paquetes, un ecosistema</div>
+      <h2 class="section-title">Arquitectura del monorepo</h2>
+      <p class="section-subtitle">Los tres paquetes viven en un unico monorepo pnpm (geniova-developer-kit). El bootstrapper verifica, el wizard configura, los hooks protegen.</p>
 
       <div class="packages-grid">
         <div class="pkg-card">
@@ -729,7 +729,7 @@
           <h3>Bootstrapper</h3>
           <p class="pkg-desc">Paquete publico en npm. Punto de entrada que verifica prerrequisitos y lanza el wizard privado.</p>
           <ul class="pkg-features">
-            <li>Repo: geniova-developer-kit</li>
+            <li>Monorepo: packages/developer-kit</li>
             <li>Comando: npx @geniova/developer-kit init</li>
             <li>git, node &gt;=18, pnpm, gh, firebase-tools</li>
             <li>claude, karajan</li>
@@ -744,7 +744,7 @@
           <h3>Wizard</h3>
           <p class="pkg-desc">Paquete privado en GitHub Packages. Wizard interactivo que configura el entorno de desarrollo global.</p>
           <ul class="pkg-features">
-            <li>Repo: geniova-kit (privado)</li>
+            <li>Monorepo: packages/wizard</li>
             <li>Instala 4 MCPs obligatorios</li>
             <li>Configura Karajan y BecarIA</li>
             <li>Todo automatico, sin intervencion manual</li>
@@ -757,7 +757,7 @@
           <h3>Git Hooks</h3>
           <p class="pkg-desc">Hooks, guidelines y MCP Server. Proteccion del repositorio y contexto para agentes IA.</p>
           <ul class="pkg-features">
-            <li>Repo: geniova-git-hooks</li>
+            <li>Monorepo: packages/git-hooks</li>
             <li>Comandos: init, generate, run</li>
             <li>8 checks automaticos</li>
             <li>13 guidelines de codigo</li>

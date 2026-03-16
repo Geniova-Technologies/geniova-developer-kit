@@ -1,0 +1,111 @@
+name: Houston Override
+
+on:
+  pull_request:
+    types: [labeled]
+
+permissions:
+  pull-requests: write
+  contents: write
+  issues: write
+
+jobs:
+  houston-override:
+    if: github.event.label.name == 'houston'
+    runs-on: ubuntu-latest
+    steps:
+      - name: Verify authorized user
+        id: auth
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          SENDER: ${{ github.event.sender.login }}
+          AUTHORIZED_USER: ${{ vars.HOUSTON_AUTHORIZED_USER }}
+        run: |
+          if [ "$SENDER" != "$AUTHORIZED_USER" ]; then
+            echo "authorized=false" >> "$GITHUB_OUTPUT"
+          else
+            echo "authorized=true" >> "$GITHUB_OUTPUT"
+          fi
+
+      - name: Reject unauthorized override
+        if: steps.auth.outputs.authorized == 'false'
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          PR_NUMBER: ${{ github.event.pull_request.number }}
+          REPO: ${{ github.repository }}
+          SENDER: ${{ github.event.sender.login }}
+        run: |
+          gh pr edit "$PR_NUMBER" --repo "$REPO" --remove-label "houston"
+          gh pr comment "$PR_NUMBER" --repo "$REPO" \
+            --body "**Houston override rejected.** User \`$SENDER\` is not authorized to use this override. Only the IT department admin can trigger Houston."
+          exit 1
+
+      - name: Verify houston reason comment
+        if: steps.auth.outputs.authorized == 'true'
+        id: reason
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          PR_NUMBER: ${{ github.event.pull_request.number }}
+          REPO: ${{ github.repository }}
+        run: |
+          REASON=$(gh pr view "$PR_NUMBER" --repo "$REPO" --json comments \
+            --jq '.comments[] | select(.body | startswith("/houston ")) | .body' \
+            | tail -1 \
+            | sed 's|^/houston ||')
+
+          if [ -z "$REASON" ]; then
+            gh pr comment "$PR_NUMBER" --repo "$REPO" \
+              --body "**Houston override requires a reason.** Please add a comment with \`/houston <reason>\` before labeling."
+            gh pr edit "$PR_NUMBER" --repo "$REPO" --remove-label "houston"
+            exit 1
+          fi
+
+          echo "reason=$REASON" >> "$GITHUB_OUTPUT"
+
+      - name: Generate GitHub App token
+        if: steps.auth.outputs.authorized == 'true'
+        id: app-token
+        uses: actions/create-github-app-token@v1
+        with:
+          app-id: ${{ secrets.BECARIA_APP_ID }}
+          private-key: ${{ secrets.BECARIA_APP_PRIVATE_KEY }}
+
+      - name: Auto-approve and merge
+        if: steps.auth.outputs.authorized == 'true'
+        env:
+          GH_TOKEN: ${{ steps.app-token.outputs.token }}
+          PR_NUMBER: ${{ github.event.pull_request.number }}
+          REPO: ${{ github.repository }}
+        run: |
+          gh pr review "$PR_NUMBER" --repo "$REPO" --approve \
+            --body "Houston override approved by authorized user."
+          gh pr merge "$PR_NUMBER" --repo "$REPO" --merge --auto
+
+      - name: Leave warning comment
+        if: steps.auth.outputs.authorized == 'true'
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          PR_NUMBER: ${{ github.event.pull_request.number }}
+          REPO: ${{ github.repository }}
+          SENDER: ${{ github.event.sender.login }}
+          REASON: ${{ steps.reason.outputs.reason }}
+        run: |
+          CHECKS=$(gh pr checks "$PR_NUMBER" --repo "$REPO" 2>/dev/null || echo "Unable to retrieve CI status")
+
+          gh pr comment "$PR_NUMBER" --repo "$REPO" --body "$(cat <<EOF
+          **HOUSTON OVERRIDE ACTIVATED**
+
+          | Field | Value |
+          |-------|-------|
+          | Activated by | \`$SENDER\` |
+          | Date | $(date -u +"%Y-%m-%dT%H:%M:%SZ") |
+          | Reason | $REASON |
+
+          **CI Status at merge time:**
+          \`\`\`
+          $CHECKS
+          \`\`\`
+
+          > This PR was merged bypassing the standard review process.
+          EOF
+          )"
