@@ -1,0 +1,73 @@
+{
+  "name": "@geniova/git-hooks",
+  "version": "1.0.0",
+  "description": "Git hooks, development guidelines, and MCP server for Geniova Technologies projects",
+  "type": "module",
+  "engines": {
+    "node": ">=18"
+  },
+  "bin": {
+    "geniova-hooks": "./bin/cli.js",
+    "geniova-hooks-mcp": "./bin/mcp.js"
+  },
+  "exports": {
+    ".": "./src/hooks/pre-commit.js",
+    "./commit-msg": "./src/hooks/commit-msg.js",
+    "./pre-push": "./src/hooks/pre-push.js",
+    "./generators": "./src/generators/guidelines.js",
+    "./checks/*": "./src/checks/*.js",
+    "./ci": "./src/ci/run-checks.js",
+    "./mcp": "./src/mcp/server.js"
+  },
+  "files": [
+    "bin/",
+    "src/",
+    "husky/",
+    "guidelines/",
+    "github-actions/"
+  ],
+  "scripts": {
+    "test": "vitest run",
+    "test:watch": "vitest",
+    "test:coverage": "vitest run --coverage",
+    "prepack": "node scripts/copy-guidelines.js"
+  },
+  "dependencies": {
+    "@modelcontextprotocol/sdk": "^1.27.1",
+    "husky": "^9.0.0"
+  },
+  "peerDependencies": {
+    "eslint": ">=9",
+    "stylelint": ">=16"
+  },
+  "peerDependenciesMeta": {
+    "eslint": {
+      "optional": true
+    },
+    "stylelint": {
+      "optional": true
+    }
+  },
+  "devDependencies": {
+    "vitest": "^3.0.0"
+  },
+  "keywords": [
+    "git-hooks",
+    "pre-commit",
+    "eslint",
+    "regression",
+    "geniova",
+    "mcp",
+    "guidelines"
+  ],
+  "license": "UNLICENSED",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/Geniova-Technologies/geniova-developer-kit",
+    "directory": "packages/git-hooks"
+  },
+  "publishConfig": {
+    "registry": "https://registry.npmjs.org",
+    "access": "public"
+  }
+}
