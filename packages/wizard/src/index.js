@@ -1,7 +1,7 @@
 import { selectProject } from './steps/select-project.js';
 import { cloneRepo } from './steps/clone-repo.js';
 import { installDeps } from './steps/install-deps.js';
-import { setupMCPs } from './steps/setup-mcps.js';
+import { installGlobalMCPs, generateProjectMCPConfig } from './steps/setup-mcps.js';
 import { setupGitHooks } from './steps/setup-git-hooks.js';
 import { generateConfig } from './steps/generate-config.js';
 import { logger } from './utils/logger.js';
@@ -48,7 +48,8 @@ export async function main() {
 
   // Step 4: Setup MCPs
   logger.step(4, totalSteps, 'Configurar MCPs');
-  await setupMCPs(project, targetDir);
+  await installGlobalMCPs();
+  generateProjectMCPConfig(project, targetDir);
   logger.success('MCPs configurados.');
   logger.info('');
 
