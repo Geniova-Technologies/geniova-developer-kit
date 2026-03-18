@@ -2,6 +2,7 @@
  * @typedef {Object} MCP
  * @property {string} id - Unique MCP identifier
  * @property {string} name - Display name
+ * @property {string} claudeName - Name used in `claude mcp add <name>` (for checking if already installed)
  * @property {string} description - Short description
  * @property {string|null} installCommand - Command to install/configure the MCP (null if manual)
  * @property {string|null} manualHint - Instructions for manual setup (shown when installCommand is null)
@@ -15,6 +16,7 @@ export const MCPS = [
   {
     id: 'planning-game',
     name: 'Planning Game MCP',
+    claudeName: 'planning-game-pro',
     description:
       'Gestion de proyectos agiles (XP). Obligatorio para todos los proyectos Geniova.',
     installCommand: null,
@@ -31,6 +33,7 @@ export const MCPS = [
   {
     id: 'chrome-devtools',
     name: 'Chrome DevTools MCP',
+    claudeName: 'chrome-devtools',
     description:
       'Verificacion visual en navegador, screenshots, depuracion de consola y red.',
     installCommand:
@@ -41,6 +44,7 @@ export const MCPS = [
   {
     id: 'sonarqube',
     name: 'SonarQube MCP',
+    claudeName: 'sonarqube',
     description:
       'Analisis de calidad de codigo, code smells, bugs y vulnerabilidades.',
     installCommand: null,
@@ -51,6 +55,7 @@ export const MCPS = [
   {
     id: 'karajan',
     name: 'Karajan MCP',
+    claudeName: 'karajan-mcp',
     description:
       'Orquestacion de agentes y code review. Obligatorio. Requiere Claude (licencia Geniova). Codex y Gemini opcionales (cuentas personales gratuitas).',
     installCommand: null,
@@ -59,6 +64,6 @@ export const MCPS = [
     requiredForAll: true,
     promptPath: true,
     buildCommand:
-      'claude mcp add karajan -s user -- node {{path}}/src/mcp/server.js',
+      'claude mcp add karajan-mcp -s user -- node {{path}}/src/mcp/server.js',
   },
 ];

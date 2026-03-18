@@ -1,8 +1,9 @@
+import { execSync } from 'node:child_process';
 import { existsSync, mkdirSync, writeFileSync } from 'node:fs';
-import { resolve, dirname, basename } from 'node:path';
+import { resolve, dirname } from 'node:path';
 import { MCPS } from '../catalog/mcps.js';
 import { confirm, input } from '../utils/prompt.js';
-import { runInteractive } from '../utils/system.js';
+import { runInteractive, getOutput } from '../utils/system.js';
 import { logger } from '../utils/logger.js';
 
 /**
@@ -108,14 +109,51 @@ async function askPathWithRetry(promptMsg, validateFile) {
 }
 
 /**
- * Installs a single MCP.
+ * Check if an MCP is already configured in Claude Code.
+ * @param {string} claudeName - The MCP name as registered in claude
+ * @returns {boolean}
+ */
+function isMCPInstalled(claudeName) {
+  if (!claudeName) return false;
+  const output = getOutput('claude mcp list 2>&1') || '';
+  return output.includes(`${claudeName}:`);
+}
+
+/**
+ * Run a claude mcp add command. Treats "already exists" as success.
+ * @param {string} command
+ * @returns {boolean}
+ */
+function runMCPAdd(command) {
+  try {
+    execSync(command, { stdio: 'pipe', encoding: 'utf-8' });
+    return true;
+  } catch (err) {
+    const output = err.stdout || err.stderr || '';
+    if (output.includes('already exists')) {
+      return true;
+    }
+    return false;
+  }
+}
+
+/**
+ * Installs a single MCP. Checks if already installed first.
  * @param {import('../catalog/mcps.js').MCP} mcp
  */
 async function installMCP(mcp) {
+  // Check if already installed
+  if (mcp.claudeName && isMCPInstalled(mcp.claudeName)) {
+    logger.success(`  ${mcp.name} ya esta configurado.`);
+    return;
+  }
+
   if (mcp.installCommand) {
     logger.info(`  Instalando ${mcp.name}...`);
-    const ok = runInteractive(mcp.installCommand);
-    if (!ok) {
+    const ok = runMCPAdd(mcp.installCommand);
+    if (ok) {
+      logger.success(`  ${mcp.name} instalado.`);
+    } else {
       logger.warn(`  No se pudo instalar ${mcp.name}.`);
       if (mcp.manualHint) logger.info(`  ${mcp.manualHint}`);
       const retry = await confirm('  Reintentar?', false);
@@ -141,8 +179,10 @@ async function installMCP(mcp) {
 
     const command = mcp.buildCommand.replaceAll('{{path}}', resolvedPath);
     logger.info(`  Ejecutando: ${command}`);
-    const ok = runInteractive(command);
-    if (!ok) {
+    const ok = runMCPAdd(command);
+    if (ok) {
+      logger.success(`  ${mcp.name} configurado.`);
+    } else {
       logger.warn(`  No se pudo instalar ${mcp.name}.`);
       const retry = await confirm('  Reintentar con otra ruta?', true);
       if (retry) return installMCP(mcp);
