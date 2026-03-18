@@ -3,6 +3,7 @@ import { selectProject } from './steps/select-project.js';
 import { cloneRepo } from './steps/clone-repo.js';
 import { installDeps } from './steps/install-deps.js';
 import { installGlobalMCPs, generateProjectMCPConfig } from './steps/setup-mcps.js';
+import { installPlugins } from './steps/setup-plugins.js';
 import { setupGitHooks } from './steps/setup-git-hooks.js';
 import { generateConfig } from './steps/generate-config.js';
 import { commandExists } from './utils/system.js';
@@ -26,7 +27,7 @@ export async function main() {
   logger.info('');
 
   // Step 1: Check prerequisites
-  logger.step(1, 2, 'Verificar prerequisitos');
+  logger.step(1, 3, 'Verificar prerequisitos');
   const ready = await checkPrerequisites();
   if (!ready) {
     logger.error('Prerequisitos no cumplidos. Saliendo.');
@@ -36,14 +37,22 @@ export async function main() {
   logger.info('');
 
   // Step 2: Setup MCPs (user-level, global)
-  logger.step(2, 2, 'Configurar MCPs (nivel usuario)');
+  logger.step(2, 3, 'Configurar MCPs (nivel usuario)');
   if (commandExists('claude')) {
     await installGlobalMCPs();
     logger.success('MCPs configurados a nivel usuario.');
   } else {
-    logger.warn('Claude Code no detectado. Saltando configuracion de MCPs.');
-    logger.info('  Los MCPs son exclusivos de Claude Code.');
+    logger.warn('Claude Code no detectado. Saltando configuracion de MCPs y plugins.');
+    logger.info('  MCPs y plugins son exclusivos de Claude Code.');
     logger.info('  Si lo instalas en el futuro, ejecuta el wizard de nuevo.');
+  }
+  logger.info('');
+
+  // Step 3: Install Claude Code plugins (user-level, global)
+  if (commandExists('claude')) {
+    logger.step(3, 3, 'Instalar plugins de Claude Code');
+    await installPlugins();
+    logger.success('Plugins configurados.');
   }
   logger.info('');
 
