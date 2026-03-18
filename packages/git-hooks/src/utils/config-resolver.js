@@ -10,6 +10,7 @@ const DEFAULT_CONFIG = {
   aiRefs: { enabled: true, extraPatterns: [], allowInFiles: ['.claude/*'] },
   commitMsg: { enabled: true, extraPatterns: [] },
   push: { enabled: true, allowedEmails: [], rebaseCheck: true, diffSummary: true, baseBranch: 'main', remote: 'origin', maxLines: 300 },
+  stripComments: { enabled: true },
 }
 
 /**
@@ -62,6 +63,9 @@ export function resolveConfig(cwd = process.cwd()) {
   }
   if (process.env.GENIOVA_HOOKS_PUSH_MAX_LINES) {
     config.push.maxLines = parseInt(process.env.GENIOVA_HOOKS_PUSH_MAX_LINES, 10)
+  }
+  if (process.env.GENIOVA_HOOKS_STRIP_COMMENTS_ENABLED === 'false') {
+    config.stripComments.enabled = false
   }
 
   return config
