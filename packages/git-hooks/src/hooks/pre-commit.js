@@ -11,12 +11,13 @@ import { logger } from '../utils/logger.js'
 import { runLintCheck } from '../checks/lint.js'
 import { runRegressionCheck } from '../checks/regression.js'
 import { runNoAiRefsCheck } from '../checks/no-ai-refs.js'
+import { runStripComments } from '../checks/strip-comments.js'
 
 async function main() {
   logger.heading('@geniova/git-hooks — pre-commit')
 
   const config = resolveConfig()
-  const stagedFiles = getStagedFiles()
+  let stagedFiles = getStagedFiles()
 
   if (stagedFiles.length === 0) {
     logger.info('Sin archivos staged — nada que verificar')
@@ -26,6 +27,13 @@ async function main() {
   logger.info(`${stagedFiles.length} archivo(s) staged`)
 
   let hasBlockingErrors = false
+
+  // Check 0: Strip comments (modifica ficheros, debe ir antes de lint)
+  if (config.stripComments?.enabled !== false) {
+    logger.heading('Strip comments')
+    runStripComments(stagedFiles)
+    stagedFiles = getStagedFiles()
+  }
 
   // Check 1: Lint
   if (config.lint.enabled) {
