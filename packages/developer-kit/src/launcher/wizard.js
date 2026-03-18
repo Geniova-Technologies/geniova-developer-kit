@@ -111,7 +111,7 @@ export async function launchWizard() {
   info(`Lanzando ${PRIVATE_PACKAGE}...\n`);
 
   return new Promise((resolve, reject) => {
-    const child = spawn('npx', [PRIVATE_PACKAGE], {
+    const child = spawn('npx', ['--yes', `${PRIVATE_PACKAGE}@latest`], {
       stdio: 'inherit',
       shell: true,
     });
