@@ -45,7 +45,7 @@ function ensurePackagesScope() {
       stdio: 'pipe',
       encoding: 'utf-8',
     });
-    if (status.includes('read:packages')) {
+    if (status.includes('read:packages') || status.includes('write:packages')) {
       return true;
     }
   } catch {
