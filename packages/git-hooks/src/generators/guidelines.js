@@ -1,6 +1,7 @@
-import { readdirSync, readFileSync, existsSync, writeFileSync } from 'node:fs'
+import { readdirSync, readFileSync, existsSync, writeFileSync, copyFileSync } from 'node:fs'
 import { join, dirname } from 'node:path'
 import { mkdirSync } from 'node:fs'
+import { GUIDELINES_SUMMARY } from './guidelines-summary.js'
 
 const PACKAGE_GUIDELINES = join(import.meta.dirname, '..', '..', 'guidelines')
 const MONOREPO_GUIDELINES = join(import.meta.dirname, '..', '..', '..', '..', 'guidelines')
@@ -59,39 +60,30 @@ function loadGuidelines() {
 
 /**
  * Genera el bloque de guidelines gestionado por @geniova/git-hooks.
+ * Uses compact summary (~3.5K) instead of full content (~33K).
+ * Full guidelines are copied to .ai/guidelines/ for deep reference.
  * @returns {string}
  */
 export function generateBlock() {
-  const guidelines = loadGuidelines()
-
   return `${START_MARKER}
 <!-- AUTOGENERADO por @geniova/git-hooks — no editar manualmente esta sección -->
 <!-- Para regenerar: npx @geniova/git-hooks generate -->
 
-# Geniova Development Guidelines
-
-${guidelines}
+${GUIDELINES_SUMMARY}
 
 ---
 
 # Guidelines dinámicas (Planning Game MCP)
 
-Las siguientes guidelines se consultan en runtime vía Planning Game MCP al inicio de cada sesión.
-NO están incluidas aquí porque evolucionan con frecuencia.
-
-## Cómo consultarlas
+Consultar en runtime al inicio de cada sesión:
 
 | Recurso | Comando MCP | Cuándo |
 |---------|-------------|--------|
 | Workflow con Planning Game | \`get_global_config('instructions', '-OlzImzK4e5Qq8ZV0RNo')\` | Siempre al trabajar con tareas/bugs |
-| Prompt de code review | \`get_global_config('prompts', '-OkmjTOQ-jErBg5JgXlI')\` | Al revisar PRs |
-| Prompt de estimación | \`get_global_config('prompts', 'prompt_estimation')\` | Al estimar tareas |
-| Prompt de acceptance criteria | \`get_global_config('prompts', 'prompt_acceptance_criteria')\` | Al crear tareas |
-| Prompt de análisis de bugs | \`get_global_config('prompts', 'prompt_bug_analysis')\` | Al analizar bugs |
-| BecarIA Developer | \`get_global_config('agents', 'agent_developer')\` | Configuración de agente dev |
-| BecarIA Code Reviewer | \`get_global_config('agents', 'agent_reviewer')\` | Configuración de agente reviewer |
 | Guidelines del proyecto | \`get_project(projectId)\` → \`agentsGuidelines\` | Siempre al empezar en un proyecto |
 | ADRs del proyecto | \`list_adrs(projectId)\` | Antes de decisiones de arquitectura |
+| Prompts (estimación, AC, bugs) | \`list_global_config('prompts')\` | Al estimar, crear tareas o analizar bugs |
+| Agentes (BecarIA) | \`list_global_config('agents')\` | Configuración de agentes |
 ${END_MARKER}`
 }
 
@@ -150,7 +142,41 @@ export function generateAllTargets(cwd) {
     })
   }
 
+  // Copy full guidelines to .ai/guidelines/ for deep reference
+  const copied = copyGuidelinesToAiDir(cwd)
+  results.push({
+    target: 'AI Guidelines Reference',
+    file: `.ai/guidelines/ (${copied.length} files)`,
+    created: true,
+  })
+
   return results
+}
+
+/**
+ * Copies full guideline files to .ai/guidelines/ in the target project.
+ * These are the detailed reference that the summary in CLAUDE.md points to.
+ *
+ * @param {string} cwd - Project root directory
+ * @returns {string[]} - List of copied files
+ */
+export function copyGuidelinesToAiDir(cwd) {
+  const aiDir = join(cwd, '.ai', 'guidelines')
+  if (!existsSync(aiDir)) {
+    mkdirSync(aiDir, { recursive: true })
+  }
+
+  const available = readdirSync(GUIDELINES_DIR)
+  const copied = []
+
+  for (const filename of GUIDELINE_ORDER) {
+    if (available.includes(filename)) {
+      copyFileSync(join(GUIDELINES_DIR, filename), join(aiDir, filename))
+      copied.push(filename)
+    }
+  }
+
+  return copied
 }
 
 /**
