@@ -1,6 +1,6 @@
 {
   "name": "@geniova-technologies/geniova-kit",
-  "version": "1.2.0",
+  "version": "1.3.0",
   "description": "Wizard de configuracion del entorno de desarrollo Geniova Technologies",
   "main": "src/index.js",
   "bin": {

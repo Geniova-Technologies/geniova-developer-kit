@@ -4,6 +4,7 @@ import { cloneRepo } from './steps/clone-repo.js';
 import { installDeps } from './steps/install-deps.js';
 import { installGlobalMCPs, generateProjectMCPConfig } from './steps/setup-mcps.js';
 import { installPlugins } from './steps/setup-plugins.js';
+import { setupWorkspace } from './steps/setup-workspace.js';
 import { setupGitHooks } from './steps/setup-git-hooks.js';
 import { generateConfig } from './steps/generate-config.js';
 import { commandExists } from './utils/system.js';
@@ -27,7 +28,7 @@ export async function main() {
   logger.info('');
 
   // Step 1: Check prerequisites
-  logger.step(1, 3, 'Verificar prerequisitos');
+  logger.step(1, 4, 'Verificar prerequisitos');
   const ready = await checkPrerequisites();
   if (!ready) {
     logger.error('Prerequisitos no cumplidos. Saliendo.');
@@ -37,7 +38,7 @@ export async function main() {
   logger.info('');
 
   // Step 2: Setup MCPs (user-level, global)
-  logger.step(2, 3, 'Configurar MCPs (nivel usuario)');
+  logger.step(2, 4, 'Configurar MCPs (nivel usuario)');
   if (commandExists('claude')) {
     await installGlobalMCPs();
     logger.success('MCPs configurados a nivel usuario.');
@@ -50,9 +51,17 @@ export async function main() {
 
   // Step 3: Install Claude Code plugins (user-level, global)
   if (commandExists('claude')) {
-    logger.step(3, 3, 'Instalar plugins de Claude Code');
+    logger.step(3, 4, 'Instalar plugins de Claude Code');
     await installPlugins();
     logger.success('Plugins configurados.');
+  }
+  logger.info('');
+
+  // Step 4: Setup workspace directory with common guidelines
+  logger.step(4, 4, 'Configurar directorio de trabajo Geniova');
+  const workspacePath = await setupWorkspace();
+  if (workspacePath) {
+    logger.success(`Workspace configurado: ${workspacePath}`);
   }
   logger.info('');
 
