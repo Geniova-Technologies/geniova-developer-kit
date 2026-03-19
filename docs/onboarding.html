@@ -657,10 +657,10 @@
           <div class="step-number">2</div>
           <div class="step-body">
             <h3>Configurar MCPs</h3>
-            <p>Los MCPs (Model Context Protocol Servers) conectan las herramientas de IA con los servicios de Geniova. El wizard los instala automaticamente en la configuracion global de Claude Code. No necesitas hacer nada, solo confirmar.</p>
+            <p>Los MCPs conectan las herramientas de IA con los servicios de Geniova. El wizard comprueba si ya estan instalados y solo configura los que falten.</p>
 
             <div class="mcp-group">
-              <div class="mcp-group-title">Todos obligatorios (instalados automaticamente por el wizard)</div>
+              <div class="mcp-group-title">Obligatorios</div>
               <div class="mcp-tags">
                 <div class="mcp-tag required">
                   <span class="mcp-tag-name">Planning Game</span>
@@ -670,18 +670,19 @@
                   <span class="mcp-tag-name">Karajan</span>
                   <span class="mcp-tag-desc">Orquestacion de agentes y code review</span>
                 </div>
+              </div>
+              <div class="mcp-group-title" style="margin-top:12px">Opcionales</div>
+              <div class="mcp-tags">
                 <div class="mcp-tag required">
                   <span class="mcp-tag-name">Chrome DevTools</span>
-                  <span class="mcp-tag-desc">Verificacion visual, screenshots, debugging</span>
+                  <span class="mcp-tag-desc">Verificacion visual y debugging</span>
                 </div>
                 <div class="mcp-tag required">
                   <span class="mcp-tag-name">SonarQube</span>
-                  <span class="mcp-tag-desc">Analisis de calidad de codigo</span>
+                  <span class="mcp-tag-desc">Calidad de codigo (requiere Docker)</span>
                 </div>
               </div>
             </div>
-
-            <p style="font-size:13px;color:var(--text-secondary);margin-top:12px"><strong style="color:var(--text-primary)">SonarQube</strong> requiere Docker en tu maquina. El wizard instala el MCP automaticamente; el servidor SonarQube se arranca con <code style="font-family:var(--font-mono);font-size:12px;color:var(--green)">docker compose -f ~/sonarqube/docker-compose.yml up -d</code>. Si no tienes Docker, el MCP se instala igualmente y podras configurar SonarQube mas adelante.</p>
           </div>
         </div>
 
@@ -689,13 +690,8 @@
         <div class="step-item">
           <div class="step-number">3</div>
           <div class="step-body">
-            <h3>Configurar Karajan y BecarIA</h3>
-            <p>El wizard genera automaticamente la configuracion de Karajan y activa BecarIA como reviewer en las Pull Requests. No necesitas editar ningun fichero manualmente.</p>
-            <ul class="step-detail-list">
-              <li>El wizard genera <span class="mono">~/.karajan/kj.config.yml</span> automaticamente</li>
-              <li>BecarIA queda activo como reviewer automatico via GitHub App en todos los repos de la org</li>
-              <li>Claude es obligatorio (licencia proporcionada por Geniova). Codex y Gemini son opcionales: puedes crear cuentas personales gratuitas para usarlos como agentes adicionales en Karajan</li>
-            </ul>
+            <h3>Instalar plugins de Claude Code</h3>
+            <p>El wizard instala plugins globales para todos los proyectos: frontend-design, impeccable (suite de diseno), code-review, pr-review-toolkit, code-simplifier, security-guidance, commit-commands y claude-code-setup.</p>
           </div>
         </div>
 
@@ -703,8 +699,17 @@
         <div class="step-item">
           <div class="step-number">4</div>
           <div class="step-body">
-            <h3>Entorno listo</h3>
-            <p>Tu entorno de desarrollo esta preparado. Ya puedes clonar cualquier proyecto de Geniova y empezar a trabajar. Al entrar en un repo, ejecuta <code style="font-family:var(--font-mono);font-size:inherit;color:var(--green)">npx @geniova/git-hooks init</code> para instalar los hooks y guidelines del proyecto.</p>
+            <h3>Configurar directorio de trabajo</h3>
+            <p>El wizard pregunta donde tienes los proyectos de Geniova (ej: <code style="font-family:var(--font-mono);font-size:inherit;color:var(--green)">~/ws_geniova</code>) y genera ahi un <code style="font-family:var(--font-mono);font-size:inherit;color:var(--green)">CLAUDE.md</code> con las guidelines comunes + <code style="font-family:var(--font-mono);font-size:inherit;color:var(--green)">.ai/guidelines/</code> con la referencia completa. Aplican a todos los proyectos dentro de ese directorio, sin afectar a proyectos personales fuera de el.</p>
+          </div>
+        </div>
+
+        <!-- Paso 5 -->
+        <div class="step-item">
+          <div class="step-number">5</div>
+          <div class="step-body">
+            <h3>Entorno listo — configura proyectos (opcional)</h3>
+            <p>El wizard te pregunta si quieres configurar un proyecto. Si dices que si, selecciona del catalogo, clona, instala dependencias, hooks y genera ficheros de config. Puedes repetir para varios proyectos o saltar este paso.</p>
             <div class="terminal">
               <div class="terminal-bar">
                 <div class="terminal-dot"></div>

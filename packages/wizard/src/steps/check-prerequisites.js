@@ -98,8 +98,12 @@ export async function checkPrerequisites() {
 
   if (!allGood) {
     logger.warn('Algunos prerequisitos no se pudieron configurar.');
-    const proceed = await confirm('Continuar de todos modos?', false);
-    return proceed;
+    const retry = await confirm('Instala lo que falte y pulsa Y para reintentar, o N para continuar sin ellos.', true);
+    if (retry) {
+      logger.info('');
+      return checkPrerequisites();
+    }
+    return true;
   }
 
   return true;

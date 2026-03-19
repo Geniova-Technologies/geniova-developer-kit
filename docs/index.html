@@ -584,6 +584,7 @@
         <a href="#packages">Paquetes</a>
         <a href="#features">Features</a>
         <a href="#quickstart">Quick Start</a>
+        <a href="#ai-prompt">Prompt IA</a>
         <a href="onboarding.html">Onboarding</a>
         <a href="pr-workflow.html">PR Workflow</a>
         <a href="reference.html">Referencia</a>
@@ -795,6 +796,29 @@
             <div class="code-inline">npx @geniova/git-hooks init</div>
           </div>
         </div>
+      </div>
+    </div>
+  </section>
+
+  <div class="divider"></div>
+
+  <!-- AI PROMPT -->
+  <section id="ai-prompt">
+    <div class="container">
+      <div class="section-label">Alternativa</div>
+      <h2 class="section-title">Deja que la IA lo haga</h2>
+      <p class="section-subtitle">Si usas Claude Code, pega este prompt y el se encarga de todo. Necesitas tener Claude Code instalado y pertenecer a la org.</p>
+
+      <div style="position:relative;background:var(--bg-surface);border:1px solid var(--border-medium);border-radius:12px;padding:24px;margin-top:32px;">
+        <button onclick="navigator.clipboard.writeText(this.nextElementSibling.textContent.trim());this.textContent='Copiado!';setTimeout(()=>this.textContent='Copiar',2000)" style="position:absolute;top:12px;right:12px;background:var(--gold-dim);color:var(--gold);border:1px solid rgba(191,161,95,0.3);border-radius:6px;padding:6px 14px;cursor:pointer;font-family:var(--font-mono);font-size:0.8rem;">Copiar</button>
+        <pre style="font-family:var(--font-mono);font-size:0.85rem;line-height:1.7;white-space:pre-wrap;color:var(--text-primary);margin:0;">Configura mi entorno de desarrollo para Geniova Technologies:
+1. Verifica que tengo instalado: node >= 18, git, gh (GitHub CLI), pnpm, firebase-tools y claude
+2. Si falta algo, instalalo (Linux: apt/npm, macOS: brew/npm)
+3. Autentica gh con SSH y scope read:packages
+4. Configura ~/.npmrc para @geniova-technologies en GitHub Packages
+5. Ejecuta: npx @geniova/developer-kit init
+6. Responde a las preguntas del wizard con los valores por defecto
+7. Si algo falla, diagnostica el error y reintenta</pre>
       </div>
     </div>
   </section>
