@@ -1,6 +1,6 @@
 {
   "name": "@geniova/git-hooks",
-  "version": "1.0.0",
+  "version": "1.1.0",
   "description": "Git hooks, development guidelines, and MCP server for Geniova Technologies projects",
   "type": "module",
   "engines": {
