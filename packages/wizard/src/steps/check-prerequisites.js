@@ -22,6 +22,14 @@ const INSTALL_COMMANDS = {
     linux: 'npm install -g firebase-tools',
     macos: 'npm install -g firebase-tools',
   },
+  claude: {
+    linux: 'npm install -g @anthropic-ai/claude-code',
+    macos: 'npm install -g @anthropic-ai/claude-code',
+  },
+  kj: {
+    linux: 'npm install -g karajan-code',
+    macos: 'npm install -g karajan-code',
+  },
 };
 
 /** Full gh install via official repo (fallback for older Linux distros) */
@@ -92,6 +100,16 @@ export async function checkPrerequisites() {
     if (!(await checkFirebaseAuth())) {
       allGood = false;
     }
+  }
+
+  // 9. Claude Code CLI
+  if (!(await checkAndInstall('claude', 'claude', os))) {
+    allGood = false;
+  }
+
+  // 10. Karajan
+  if (!(await checkAndInstall('kj', 'kj', os))) {
+    allGood = false;
   }
 
   logger.info('');
