@@ -555,20 +555,16 @@
       .pkg-card,
       .pkg-card:first-child,
       .pkg-card:last-child { border-radius: 12px; }
-      .features-grid { grid-template-columns: repeat(2, 1fr); }
-      .feature-cell,
-      .feature-cell:nth-child(1),
-      .feature-cell:nth-child(4),
-      .feature-cell:nth-child(5),
-      .feature-cell:nth-child(8) { border-radius: 0; }
+      .features-grid { grid-template-columns: repeat(2, 1fr) !important; }
+      .feature-cell { border-radius: 0 !important; }
       .arch-diagram { flex-direction: column; }
       .arch-arrow { transform: rotate(90deg); padding: 8px 0; }
-      .pipeline { gap: 8px; }
+      .pipeline { gap: 8px; flex-wrap: wrap; justify-content: center; }
       .step-arrow { display: none; }
       .step-node { font-size: 11px; padding: 8px 12px; }
     }
     @media (max-width: 600px) {
-      .features-grid { grid-template-columns: 1fr; }
+      .features-grid { grid-template-columns: 1fr !important; }
       .nav-links { display: none; }
       footer .container { flex-direction: column; gap: 16px; text-align: center; }
     }
@@ -583,12 +579,12 @@
       <div class="nav-links">
         <a href="#packages">Paquetes</a>
         <a href="#features">Features</a>
-        <a href="#quickstart">Quick Start</a>
-        <a href="#ai-prompt">Prompt IA</a>
+        <a href="#quickstart">Comandos</a>
+        <a href="#workflow">Workflow</a>
+        <a href="#rules">Reglas</a>
         <a href="onboarding.html">Onboarding</a>
         <a href="pr-workflow.html">PR Workflow</a>
         <a href="reference.html">Referencia</a>
-        <a href="https://github.com/Geniova-Technologies/geniova-developer-kit">GitHub</a>
       </div>
     </div>
   </nav>
@@ -609,10 +605,10 @@
         <div class="terminal-body">
           <div><span class="prompt">$</span> <span class="cmd">npx</span> <span class="flag">@geniova/developer-kit</span> <span class="cmd">init</span></div>
           <div><span class="output">&nbsp;</span></div>
-          <div><span class="success">&#10003;</span> <span class="output">7 herramientas verificadas</span></div>
+          <div><span class="success">&#10003;</span> <span class="output">10 herramientas verificadas</span></div>
           <div><span class="success">&#10003;</span> <span class="output">GitHub + Firebase autenticados</span></div>
-          <div><span class="success">&#10003;</span> <span class="output">4 MCPs instalados</span></div>
-          <div><span class="success">&#10003;</span> <span class="output">Karajan y BecarIA configurados</span></div>
+          <div><span class="success">&#10003;</span> <span class="output">4 MCPs + 8 plugins instalados</span></div>
+          <div><span class="success">&#10003;</span> <span class="output">3 hooks, 5 workflows, 13 guidelines</span></div>
           <div><span class="output">&nbsp;</span></div>
           <div><span class="success">Entorno listo!</span> <span class="terminal-cursor"></span></div>
         </div>
@@ -651,10 +647,11 @@
           <h3>Wizard</h3>
           <p class="pkg-desc">Configuracion automatica del entorno global. Instala MCPs, configura Karajan y deja todo listo para trabajar.</p>
           <ul class="pkg-features">
-            <li>4 MCPs obligatorios</li>
+            <li>4 MCPs + 8 plugins de Claude Code</li>
             <li>Karajan + BecarIA configurados</li>
-            <li>Configuracion global de Claude Code</li>
-            <li>Todo automatico, sin intervencion</li>
+            <li>Comando create: scaffold completo</li>
+            <li>Comando sync: regenerar config</li>
+            <li>15 proyectos en catalogo</li>
             <li>Paquete privado (GitHub Packages)</li>
           </ul>
         </div>
@@ -691,19 +688,19 @@
           <div class="step-arrow">&rarr;</div>
         </div>
         <div class="pipeline-step">
-          <div class="step-node">Auth</div>
-          <div class="step-arrow">&rarr;</div>
-        </div>
-        <div class="pipeline-step">
           <div class="step-node">MCPs</div>
           <div class="step-arrow">&rarr;</div>
         </div>
         <div class="pipeline-step">
-          <div class="step-node">Karajan</div>
+          <div class="step-node">Plugins</div>
           <div class="step-arrow">&rarr;</div>
         </div>
         <div class="pipeline-step">
-          <div class="step-node">BecarIA</div>
+          <div class="step-node">Workspace</div>
+          <div class="step-arrow">&rarr;</div>
+        </div>
+        <div class="pipeline-step">
+          <div class="step-node">Clone + Hooks</div>
           <div class="step-arrow">&rarr;</div>
         </div>
         <div class="pipeline-step">
@@ -726,7 +723,7 @@
         <div class="feature-cell">
           <div class="feature-icon gold">BP</div>
           <h3>Branch Protection</h3>
-          <p>PRs obligatorias, 1 aprobacion minima, dismiss stale reviews. Aplicable a todos los repos.</p>
+          <p>PRs obligatorias, 1 aprobacion minima, dismiss stale reviews, no force push. Aplicado automaticamente.</p>
         </div>
         <div class="feature-cell">
           <div class="feature-icon blue">BR</div>
@@ -736,32 +733,52 @@
         <div class="feature-cell">
           <div class="feature-icon green">AM</div>
           <h3>Automerge</h3>
-          <p>Label automerge + aprobacion de BecarIA + CI verde = merge automatico por squash.</p>
+          <p>Label automerge + aprobacion de BecarIA + CI verde = merge automatico.</p>
         </div>
         <div class="feature-cell">
           <div class="feature-icon gold">HO</div>
           <h3>Houston Override</h3>
-          <p>Override de emergencia para IT. Label houston + comentario con razon = merge inmediato con audit trail.</p>
+          <p>Override de emergencia para IT. Label houston + comentario /houston razon = merge con audit trail.</p>
         </div>
         <div class="feature-cell">
-          <div class="feature-icon blue">KJ</div>
-          <h3>Karajan</h3>
-          <p>Pipeline AI completo: Coder, Reviewer, Solomon, Sonar. Todo en local con las keys del developer.</p>
+          <div class="feature-icon blue">GH</div>
+          <h3>5 GitHub Actions</h3>
+          <p>CI, automerge, becaria-gateway, houston-override, no-ai-refs. Copiados automaticamente con create.</p>
+        </div>
+        <div class="feature-cell">
+          <div class="feature-icon green">HK</div>
+          <h3>3 Hooks, 8 Checks</h3>
+          <p>Pre-commit (lint, regression, AI refs), commit-msg, pre-push (SSH, identity, rebase, diff). Todo via Husky.</p>
+        </div>
+        <div class="feature-cell">
+          <div class="feature-icon gold">GL</div>
+          <h3>13 Guidelines</h3>
+          <p>Estilo, naming, errores, testing, seguridad, UI/UX, commits, deps, plan, proteccion, Firebase, Astro+Lit, identidad.</p>
+        </div>
+        <div class="feature-cell">
+          <div class="feature-icon blue">AI</div>
+          <h3>5 Agentes IA</h3>
+          <p>Guidelines auto-generados para Claude, Copilot, Codex, Gemini y Cursor. Actualizados con cada init.</p>
         </div>
         <div class="feature-cell">
           <div class="feature-icon green">PG</div>
           <h3>Planning Game</h3>
-          <p>MCP integrado para gestion de tareas, sprints, bugs y estimaciones directamente desde el IDE.</p>
+          <p>MCP para tareas, sprints, bugs, estimaciones (devPoints/businessPoints), ADRs. Desde el IDE.</p>
         </div>
         <div class="feature-cell">
-          <div class="feature-icon gold">SQ</div>
-          <h3>SonarQube</h3>
-          <p>Analisis de calidad integrado. Quality gates, coverage, code smells. Requiere Docker para el servidor local.</p>
+          <div class="feature-icon gold">KJ</div>
+          <h3>Karajan</h3>
+          <p>Orquestacion AI: Coder, Reviewer, Solomon, Tester, Security. Local con keys del developer.</p>
         </div>
         <div class="feature-cell">
-          <div class="feature-icon blue">18</div>
-          <h3>18 Proyectos</h3>
-          <p>Catalogo completo de Geniova: Extranet, Intranet, Visor 3D, PlanningGame, Auth, y mas.</p>
+          <div class="feature-icon blue">PL</div>
+          <h3>8 Plugins</h3>
+          <p>frontend-design, impeccable, code-review, pr-review-toolkit, code-simplifier, security-guidance y mas.</p>
+        </div>
+        <div class="feature-cell">
+          <div class="feature-icon green">CR</div>
+          <h3>Scaffold + Create</h3>
+          <p>Comando create: repo GitHub + scaffold (Astro/Next/Node) + hooks + actions + protection en un wizard.</p>
         </div>
       </div>
     </div>
@@ -781,7 +798,7 @@
           <div class="qs-number">1</div>
           <div class="qs-content">
             <h3>Ejecuta el bootstrapper</h3>
-            <p>Verifica 7 herramientas, autenticacion, instala MCPs y configura Karajan. Todo automatico.</p>
+            <p>Verifica 10 herramientas, autenticacion, instala 4 MCPs + 8 plugins, crea workspace con guidelines. Todo interactivo.</p>
             <div class="code-inline">npx @geniova/developer-kit init</div>
           </div>
         </div>
@@ -789,11 +806,29 @@
         <div class="qs-step">
           <div class="qs-number">2</div>
           <div class="qs-content">
-            <h3>Clona un proyecto y empieza a trabajar</h3>
-            <p>Tu entorno esta listo. Clona cualquier repo de Geniova, instala dependencias e instala los hooks y guidelines del proyecto.</p>
+            <h3>Clona un proyecto existente</h3>
+            <p>El wizard te permite seleccionar proyectos del catalogo. Tambien puedes clonar manualmente:</p>
             <div class="code-inline" style="margin-bottom:8px">gh repo clone Geniova-Technologies/{proyecto}</div>
-            <div class="code-inline" style="margin-bottom:8px">pnpm install</div>
             <div class="code-inline">npx @geniova/git-hooks init</div>
+          </div>
+        </div>
+
+        <div class="qs-step">
+          <div class="qs-number">&#10038;</div>
+          <div class="qs-content">
+            <h3>O crea un proyecto nuevo</h3>
+            <p>Scaffold completo: repo en GitHub, estructura segun stack (Astro+Lit / Next / Node), hooks, 5 GitHub Actions, branch protection y .env con config de Firebase/Vercel.</p>
+            <div class="code-inline" style="margin-bottom:8px">npx @geniova-technologies/geniova-kit create</div>
+            <p style="font-size:12px;margin-top:4px">Stacks: Astro + Lit &middot; Next.js &middot; Node.js puro</p>
+          </div>
+        </div>
+
+        <div class="qs-step">
+          <div class="qs-number">&#8635;</div>
+          <div class="qs-content">
+            <h3>Sincroniza un proyecto existente</h3>
+            <p>Re-genera guidelines, verifica hooks, MCPs y .env de un proyecto ya configurado.</p>
+            <div class="code-inline">npx @geniova-technologies/geniova-kit sync [directorio]</div>
           </div>
         </div>
       </div>
@@ -819,6 +854,136 @@
 5. Ejecuta: npx @geniova/developer-kit init
 6. Responde a las preguntas del wizard con los valores por defecto
 7. Si algo falla, diagnostica el error y reintenta</pre>
+      </div>
+    </div>
+  </section>
+
+  <div class="divider"></div>
+
+  <!-- WORKFLOW -->
+  <section id="workflow">
+    <div class="container">
+      <div class="section-label">Como trabajar</div>
+      <h2 class="section-title">Workflow obligatorio</h2>
+      <p class="section-subtitle">Todo cambio sigue este flujo. Sin excepciones. Nunca push directo a main.</p>
+
+      <div class="pipeline" style="margin-bottom:48px">
+        <div class="pipeline-step">
+          <div class="step-node active">Card en PG</div>
+          <div class="step-arrow">&rarr;</div>
+        </div>
+        <div class="pipeline-step">
+          <div class="step-node">In Progress</div>
+          <div class="step-arrow">&rarr;</div>
+        </div>
+        <div class="pipeline-step">
+          <div class="step-node">Rama feat/fix</div>
+          <div class="step-arrow">&rarr;</div>
+        </div>
+        <div class="pipeline-step">
+          <div class="step-node">Commits</div>
+          <div class="step-arrow">&rarr;</div>
+        </div>
+        <div class="pipeline-step">
+          <div class="step-node">Push + PR</div>
+          <div class="step-arrow">&rarr;</div>
+        </div>
+        <div class="pipeline-step">
+          <div class="step-node">kj review</div>
+          <div class="step-arrow">&rarr;</div>
+        </div>
+        <div class="pipeline-step">
+          <div class="step-node active">To Validate</div>
+        </div>
+      </div>
+
+      <div class="features-grid" style="grid-template-columns:repeat(3,1fr)">
+        <div class="feature-cell" style="border-radius:12px 0 0 12px">
+          <div class="feature-icon gold">1</div>
+          <h3>Planning Game</h3>
+          <p>Toda tarea necesita card (task/bug). Marcar "In Progress" con startDate al empezar. devPoints + businessPoints para prioridad automatica.</p>
+        </div>
+        <div class="feature-cell">
+          <div class="feature-icon blue">2</div>
+          <h3>Desarrollo</h3>
+          <p>Rama <code style="background:var(--bg-deep);padding:2px 6px;border-radius:3px;font-size:11px">feat/CARD-ID-desc</code>. Conventional Commits. Test-first (TDD). Max ~300 lineas por PR. Implementation Plan si devPoints &ge; 3.</p>
+        </div>
+        <div class="feature-cell" style="border-radius:0 12px 12px 0">
+          <div class="feature-icon green">3</div>
+          <h3>Review + Merge</h3>
+          <p>Push + PR + <code style="background:var(--bg-deep);padding:2px 6px;border-radius:3px;font-size:11px">kj review</code>. BecarIA publica review. Label automerge para merge automatico. Marcar "To Validate" con commits.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <div class="divider"></div>
+
+  <!-- HOOKS & RULES -->
+  <section id="rules">
+    <div class="container">
+      <div class="section-label">Proteccion automatica</div>
+      <h2 class="section-title">Hooks y reglas</h2>
+      <p class="section-subtitle">3 hooks de git con 8 checks automaticos. Mas 13 guidelines embebidos en todos los agentes IA.</p>
+
+      <div class="packages-grid" style="margin-bottom:48px">
+        <div class="pkg-card">
+          <div class="pkg-number" style="font-size:32px">&#9998;</div>
+          <div class="pkg-name">pre-commit</div>
+          <h3>4 checks al commitear</h3>
+          <p class="pkg-desc">Se ejecuta automaticamente antes de cada commit.</p>
+          <ul class="pkg-features">
+            <li>Strip Comments &mdash; limpia indicadores IA</li>
+            <li>Lint (ESLint + Stylelint) &mdash; bloquea</li>
+            <li>Regression &mdash; detecta codigo re-anadido</li>
+            <li>No AI Refs &mdash; bloquea menciones a IA</li>
+          </ul>
+        </div>
+
+        <div class="pkg-card">
+          <div class="pkg-number" style="font-size:32px">&#9993;</div>
+          <div class="pkg-name">commit-msg</div>
+          <h3>Mensaje sin IA</h3>
+          <p class="pkg-desc">Valida que el mensaje de commit no contenga referencias a herramientas de IA.</p>
+          <ul class="pkg-features">
+            <li>Co-Authored-By: Claude/GPT &mdash; bloqueado</li>
+            <li>"Generated by AI" &mdash; bloqueado</li>
+            <li>"AI-assisted" &mdash; bloqueado</li>
+            <li>Conventional Commits recomendado</li>
+          </ul>
+        </div>
+
+        <div class="pkg-card">
+          <div class="pkg-number" style="font-size:32px">&#8679;</div>
+          <div class="pkg-name">pre-push</div>
+          <h3>4 checks al pushear</h3>
+          <p class="pkg-desc">Solo en ramas feat/* y fix/*. Verifica antes de enviar.</p>
+          <ul class="pkg-features">
+            <li>SSH Remote &mdash; no HTTPS, bloquea</li>
+            <li>Git Identity &mdash; email @geniova.com</li>
+            <li>Rebase Check &mdash; rebasado sobre main</li>
+            <li>Diff Summary &mdash; warn si &gt;300 lineas</li>
+          </ul>
+        </div>
+      </div>
+
+      <div class="section-label" style="margin-top:32px">13 guidelines de codigo</div>
+      <div class="features-grid" style="grid-template-columns:repeat(4,1fr);margin-top:16px">
+        <div class="feature-cell" style="border-radius:12px 0 0 0"><h3 style="font-size:13px">1. Estilo</h3><p>SOLID, DRY, KISS, YAGNI. const por defecto.</p></div>
+        <div class="feature-cell"><h3 style="font-size:13px">2. Naming</h3><p>kebab-case archivos, camelCase funciones, PascalCase clases.</p></div>
+        <div class="feature-cell"><h3 style="font-size:13px">3. Errores</h3><p>Explicitos, nunca silenciosos. No || para datos criticos.</p></div>
+        <div class="feature-cell" style="border-radius:0 12px 0 0"><h3 style="font-size:13px">4. Testing</h3><p>Test-first. Vitest + Playwright. Coverage 80/90/70%.</p></div>
+        <div class="feature-cell"><h3 style="font-size:13px">5. Seguridad</h3><p>Validar inputs, XSS, SQL injection. No secrets en git.</p></div>
+        <div class="feature-cell"><h3 style="font-size:13px">6. UI/UX</h3><p>No alert() nativo. ModalService. Loading, toast, a11y.</p></div>
+        <div class="feature-cell"><h3 style="font-size:13px">7. Commits</h3><p>Conventional Commits. Max 300 lineas. Sin refs IA.</p></div>
+        <div class="feature-cell"><h3 style="font-size:13px">8. Deps</h3><p>Solo si no se puede en &lt;50 lineas. npm audit regular.</p></div>
+        <div class="feature-cell" style="border-radius:0 0 0 12px"><h3 style="font-size:13px">9. Plan</h3><p>Obligatorio si devPoints &ge; 3 o &gt;2 ficheros.</p></div>
+        <div class="feature-cell"><h3 style="font-size:13px">10. Archivos</h3><p>Nunca sobreescribir sin leer. Edit puntual, no Write.</p></div>
+        <div class="feature-cell"><h3 style="font-size:13px">11. Firebase</h3><p>Modelado Firestore, security rules, no Admin en cliente.</p></div>
+        <div class="feature-cell" style="border-radius:0 0 12px 0"><h3 style="font-size:13px">12. Astro+Lit</h3><p>SSG vs SPA. Web Components. Hidratacion selectiva.</p></div>
+      </div>
+      <div style="text-align:center;margin-top:16px">
+        <p style="font-size:13px;color:var(--text-tertiary)">+ 13. Git &amp; Firebase Identity &mdash; SSH obligatorio, verificar cuenta antes de deploy</p>
       </div>
     </div>
   </section>
@@ -879,7 +1044,7 @@
       });
     }, { threshold: 0.1, rootMargin: '0px 0px -40px 0px' });
 
-    document.querySelectorAll('.pkg-card, .feature-cell, .qs-step, .arch-box').forEach((el, i) => {
+    document.querySelectorAll('.pkg-card, .feature-cell, .qs-step, .arch-box, .step-node').forEach((el, i) => {
       el.style.opacity = '0';
       el.style.transform = 'translateY(20px)';
       el.style.transition = `opacity 0.5s ease ${i * 0.05}s, transform 0.5s ease ${i * 0.05}s`;
