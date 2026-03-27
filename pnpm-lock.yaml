@@ -33,7 +33,11 @@ importers:
         specifier: ^3.0.0
         version: 3.2.4
 
-  packages/wizard: {}
+  packages/wizard:
+    devDependencies:
+      vitest:
+        specifier: ^3.0.0
+        version: 3.2.4
 
 packages:
 
