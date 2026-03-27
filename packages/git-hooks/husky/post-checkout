@@ -1,0 +1,8 @@
+#!/bin/sh
+# Geniova git-hooks: warn if dependencies are missing after checkout
+if [ ! -d "node_modules/@geniova/git-hooks" ]; then
+  echo ""
+  echo "  ⚠  @geniova/git-hooks no está instalado."
+  echo "  Ejecuta: pnpm install && npx @geniova/git-hooks init"
+  echo ""
+fi
