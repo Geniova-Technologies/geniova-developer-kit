@@ -37,6 +37,14 @@ npx @geniova/developer-kit init          (npmjs.com - público)
 
 Antes de publicar, asegurarse de que el código fuente del monorepo está sincronizado con lo que se va a publicar. El monorepo es la fuente de verdad.
 
+## Documentación / Landing
+
+- La web **devkit.geniova.com** está alojada en **GitHub Pages** desde el directorio `docs/` de este repo (rama `main`)
+- El repo es **público** — necesario para GitHub Pages gratis y para que `npx @geniova/developer-kit` funcione desde npm público
+- CNAME configurado en `docs/CNAME`
+- Páginas: `index.html`, `onboarding.html`, `pr-workflow.html`, `reference.html`
+- Al modificar la documentación, los cambios se publican automáticamente al mergear a `main`
+
 ## MCPs en el wizard
 
 - Antes de instalar un MCP, comprobar si ya está configurado (`claude mcp list`)

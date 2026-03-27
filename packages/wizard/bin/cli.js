@@ -2,11 +2,17 @@
 
 import { main } from '../src/index.js';
 import { sync } from '../src/steps/sync.js';
+import { createProject } from '../src/commands/create-project.js';
 
 const command = process.argv[2];
 
 if (command === 'sync') {
   sync(process.argv[3]).catch((err) => {
+    console.error(err);
+    process.exit(1);
+  });
+} else if (command === 'create') {
+  createProject().catch((err) => {
     console.error(err);
     process.exit(1);
   });
