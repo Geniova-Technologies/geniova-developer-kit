@@ -83,3 +83,46 @@ export async function input(message, defaultValue = '') {
     });
   });
 }
+
+/**
+ * Prompts the user for multiline input (e.g. pasting a JSON block).
+ * Reads lines until a closing brace `}` is detected on its own line,
+ * or until the user sends two consecutive empty lines.
+ * @param {string} message - The prompt message
+ * @returns {Promise<string>} The collected multiline text
+ */
+export async function multilineInput(message) {
+  const rl = createRL();
+  const lines = [];
+
+  console.log(`${message}`);
+  console.log('  (Pega el contenido. Finaliza con } o dos lineas vacias)\n');
+
+  return new Promise((resolve) => {
+    let emptyCount = 0;
+
+    const onLine = (line) => {
+      if (line.trim() === '') {
+        emptyCount++;
+        if (emptyCount >= 2) {
+          rl.off('line', onLine);
+          rl.close();
+          resolve(lines.join('\n'));
+          return;
+        }
+      } else {
+        emptyCount = 0;
+      }
+
+      lines.push(line);
+
+      if (line.trim() === '}') {
+        rl.off('line', onLine);
+        rl.close();
+        resolve(lines.join('\n'));
+      }
+    };
+
+    rl.on('line', onLine);
+  });
+}
