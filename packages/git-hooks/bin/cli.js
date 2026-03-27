@@ -96,6 +96,18 @@ function init() {
   writeFileSync(join(huskyDir, 'pre-push'), prePushScript, { mode: 0o755 })
   success('Hook pre-push creado en .husky/pre-push')
 
+  // 2d. Crear .husky/post-checkout y post-merge (aviso si falta geniova-git-hooks)
+  const postCheckoutSrc = join(import.meta.dirname, '..', 'husky', 'post-checkout')
+  const postMergeSrc = join(import.meta.dirname, '..', 'husky', 'post-merge')
+  if (existsSync(postCheckoutSrc)) {
+    copyFileSync(postCheckoutSrc, join(huskyDir, 'post-checkout'))
+    success('Hook post-checkout creado en .husky/post-checkout')
+  }
+  if (existsSync(postMergeSrc)) {
+    copyFileSync(postMergeSrc, join(huskyDir, 'post-merge'))
+    success('Hook post-merge creado en .husky/post-merge')
+  }
+
   // 3. Añadir prepare script al package.json
   const pkgPath = join(cwd, 'package.json')
   const pkg = JSON.parse(readFileSync(pkgPath, 'utf-8'))
