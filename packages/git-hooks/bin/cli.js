@@ -41,6 +41,34 @@ Uso:
   process.exit(0)
 }
 
+const GENIOVA_MARKER = '@geniova/git-hooks'
+
+/**
+ * Installs a hook in .husky/, backing up existing non-geniova hooks.
+ * @param {string} huskyDir
+ * @param {string} hookName
+ * @param {string} script
+ */
+function installHook(huskyDir, hookName, script) {
+  const hookPath = join(huskyDir, hookName)
+
+  if (existsSync(hookPath)) {
+    const existing = readFileSync(hookPath, 'utf-8')
+    if (existing.includes(GENIOVA_MARKER)) {
+      writeFileSync(hookPath, script, { mode: 0o755 })
+      success(`Hook ${hookName} actualizado en .husky/${hookName}`)
+      return
+    }
+    // Custom hook — backup and warn
+    const backupPath = `${hookPath}.backup`
+    writeFileSync(backupPath, existing, { mode: 0o755 })
+    info(`Hook ${hookName} existente guardado en .husky/${hookName}.backup`)
+  }
+
+  writeFileSync(hookPath, script, { mode: 0o755 })
+  success(`Hook ${hookName} creado en .husky/${hookName}`)
+}
+
 if (command === 'init') {
   init()
 } else if (command === 'generate') {
@@ -76,25 +104,15 @@ function init() {
     info('Husky ya inicializado o no disponible, continuando...')
   }
 
-  // 2. Crear .husky/pre-commit
+  // 2. Crear hooks en .husky/
   const huskyDir = join(cwd, '.husky')
   if (!existsSync(huskyDir)) {
     mkdirSync(huskyDir, { recursive: true })
   }
 
-  const preCommitScript = `node node_modules/@geniova/git-hooks/src/hooks/pre-commit.js\n`
-  writeFileSync(join(huskyDir, 'pre-commit'), preCommitScript, { mode: 0o755 })
-  success('Hook pre-commit creado en .husky/pre-commit')
-
-  // 2b. Crear .husky/commit-msg
-  const commitMsgScript = `node node_modules/@geniova/git-hooks/src/hooks/commit-msg.js "$1"\n`
-  writeFileSync(join(huskyDir, 'commit-msg'), commitMsgScript, { mode: 0o755 })
-  success('Hook commit-msg creado en .husky/commit-msg')
-
-  // 2c. Crear .husky/pre-push
-  const prePushScript = `node node_modules/@geniova/git-hooks/src/hooks/pre-push.js\n`
-  writeFileSync(join(huskyDir, 'pre-push'), prePushScript, { mode: 0o755 })
-  success('Hook pre-push creado en .husky/pre-push')
+  installHook(huskyDir, 'pre-commit', `node node_modules/@geniova/git-hooks/src/hooks/pre-commit.js\n`)
+  installHook(huskyDir, 'commit-msg', `node node_modules/@geniova/git-hooks/src/hooks/commit-msg.js "$1"\n`)
+  installHook(huskyDir, 'pre-push', `node node_modules/@geniova/git-hooks/src/hooks/pre-push.js\n`)
 
   // 2d. Crear .husky/post-checkout y post-merge (aviso si falta geniova-git-hooks)
   const postCheckoutSrc = join(import.meta.dirname, '..', 'husky', 'post-checkout')
